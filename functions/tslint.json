@@ -1,0 +1,16 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "no-console": false,
+    "trailing-comma": false,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "no-var-requires": false,
+    "indent": [true, "spaces", 2],
+    "max-line-length": [
+      true,
+      150
+    ]
+  }
+}
