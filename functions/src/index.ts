@@ -1,9 +1,11 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 
+import * as triggerFunctions from './triggers';
+
 admin.initializeApp(functions.config().firebase);
 
-const firebaseFunction = functions.region();
+const firebaseFunction = functions.region('us-central1');
 
 // ----------------- //
 //     SCHEDULED     //
@@ -17,6 +19,6 @@ const firebaseFunction = functions.region();
 //      TRIGGERS      //
 // ------------------ //
 
-// export const writeCustomers = firebaseFunction.firestore
-//   .document('customers/{customer}')
-//   .onWrite((snap, context) => triggerFunctions.writeCustomers(admin, snap, context));
+export const writeDeathGamesCollectionPlayers = firebaseFunction.firestore
+  .document('nft-death-games/{season}/collections/{collection}/players/{player}')
+  .onWrite((snap, context) => triggerFunctions.writeDeathGamesCollectionPlayers(admin, snap, context));
