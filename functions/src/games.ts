@@ -59,16 +59,19 @@ const duel = ({
 
         const maxSpecialAttack = specialElementStrong ? Math.min(p2Stats.special_attack * 2, 15) : p2Stats.special_attack;
         const specialAttack = randomIntFromInterval(0, maxSpecialAttack);
-        const specialAttackCounter = randomIntFromInterval(0, p1Stats.special_attack);
+        const specialAttackCounter = randomIntFromInterval(0, maxSpecialAttack);
         const counterAttack = specialElementWeak ? specialAttackCounter - specialAttack : -1;
 
-        bout.is_dodged = specialElementWeak && counterAttack === 0;
         bout.special_attack = specialAttack;
 
-        if (counterAttack > 0) {
-          bout.counter_special_attack = counterAttack;
-          p2Stats.special_defense = p2Stats.special_defense - counterAttack;
-        } else if (!bout.is_dodged) {
+        if (counterAttack >= 0) {
+          if (p2Stats.special_defense > 0) {
+            bout.counter_special_attack = counterAttack;
+            p2Stats.special_defense = p2Stats.special_defense - counterAttack;
+          }
+
+          bout.is_dodged = true;
+        } else {
           bout.is_critical = specialAttack === maxSpecialAttack;
           p1Stats.special_defense = p1Stats.special_defense - specialAttack;
         }
@@ -78,16 +81,19 @@ const duel = ({
 
         const maxAttack = elementStrong ? Math.min(p2Stats.attack * 2, 15) : p2Stats.attack;
         const attack = randomIntFromInterval(0, maxAttack);
-        const attackCounter = randomIntFromInterval(0, p1Stats.attack);
+        const attackCounter = randomIntFromInterval(0, maxAttack);
         const counterAttack = elementWeak ? attackCounter - attack : -1;
 
-        bout.is_dodged = elementWeak && counterAttack === 0;
         bout.attack = attack;
 
-        if (counterAttack > 0) {
-          bout.counter_attack = counterAttack;
-          p2Stats.defense = p2Stats.defense - counterAttack;
-        } else if (!bout.is_dodged) {
+        if (counterAttack >= 0) {
+          if (p2Stats.special_defense <= 0) {
+            bout.counter_attack = counterAttack;
+            p2Stats.defense = p2Stats.defense - counterAttack;
+          }
+
+          bout.is_dodged = true;
+        } else {
           bout.is_critical = attack === maxAttack;
           p1Stats.defense = p1Stats.defense - attack;
         }
@@ -101,16 +107,19 @@ const duel = ({
 
         const maxSpecialAttack = specialElementStrong ? Math.min(p1Stats.special_attack * 2, 15) : p1Stats.special_attack;
         const specialAttack = randomIntFromInterval(0, maxSpecialAttack);
-        const specialAttackCounter = randomIntFromInterval(0, p2Stats.special_attack);
+        const specialAttackCounter = randomIntFromInterval(0, maxSpecialAttack);
         const counterAttack = specialElementWeak ? specialAttackCounter - specialAttack : -1;
 
-        bout.is_dodged = specialElementWeak && counterAttack === 0;
         bout.special_attack = specialAttack;
 
-        if (counterAttack > 0) {
-          bout.counter_special_attack = counterAttack;
-          p1Stats.special_defense = p1Stats.special_defense - counterAttack;
-        } else if (!bout.is_dodged) {
+        if (counterAttack >= 0) {
+          if (p1Stats.special_defense > 0) {
+            bout.counter_special_attack = counterAttack;
+            p1Stats.special_defense = p1Stats.special_defense - counterAttack;
+          }
+
+          bout.is_dodged = true;
+        } else {
           bout.is_critical = specialAttack === maxSpecialAttack;
           p2Stats.special_defense = p2Stats.special_defense - specialAttack;
         }
@@ -120,16 +129,19 @@ const duel = ({
 
         const maxAttack = elementStrong ? Math.min(p1Stats.attack * 2, 15) : p1Stats.attack;
         const attack = randomIntFromInterval(0, maxAttack);
-        const attackCounter = randomIntFromInterval(0, p2Stats.attack);
+        const attackCounter = randomIntFromInterval(0, maxAttack);
         const counterAttack = elementWeak ? attackCounter - attack : -1;
 
-        bout.is_dodged = elementWeak && counterAttack === 0;
         bout.attack = attack;
 
-        if (counterAttack > 0) {
-          bout.counter_attack = counterAttack;
-          p1Stats.defense = p1Stats.defense - counterAttack;
-        } else if (!bout.is_dodged) {
+        if (counterAttack >= 0) {
+          if (p1Stats.special_defense <= 0) {
+            bout.counter_attack = counterAttack;
+            p1Stats.defense = p1Stats.defense - counterAttack;
+          }
+
+          bout.is_dodged = true;
+        } else {
           bout.is_critical = attack === maxAttack;
           p2Stats.defense = p2Stats.defense - attack;
         }
@@ -146,10 +158,43 @@ const duel = ({
       elements,
     });
   } else {
+    let winner = '';
+
+    if (p1Stats.defense === p2Stats.defense) {
+      const p1FinalAttack = randomIntFromInterval(0, p1Stats.attack + p1Stats.special_attack);
+      const p2FinalAttack = randomIntFromInterval(0, p2Stats.attack + p2Stats.special_attack);
+
+      if (p1FinalAttack > p2FinalAttack) {
+        winner = 'p1';
+
+        bouts.push({
+          fighter: winner,
+          attack:p1FinalAttack,
+          sudden_death: true,
+        });
+      } else if (p1FinalAttack < p2FinalAttack) {
+        winner = 'p2';
+
+        bouts.push({
+          fighter: winner,
+          attack: p2FinalAttack,
+          sudden_death: true,
+        });
+      } else {
+        winner = p2Turn ? 'p2' : 'p1';
+
+        bouts.push({
+          fighter: winner,
+          attack: Math.min(p2Turn ? p2FinalAttack : p1FinalAttack, 15),
+          sudden_death: true,
+        });
+      }
+    }
+
     return {
       p1: p1Stats,
       p2: p2Stats,
-      winner: p1Stats.defense !== p2Stats.defense ? (p1Stats.defense < p2Stats.defense ? 'p2' : 'p1') : '',
+      winner,
       bouts,
     };
   }
@@ -202,6 +247,7 @@ export const saveGames = async ({
         p2: p2.id,
         winner: result.winner,
         is_ko: false,
+        is_sudden_death: false,
         p1_not_injured: result.p1.defense === p1.defense,
         p2_not_injured: result.p2.defense === p2.defense,
         p1_not_touched: result.p1.special_defense === p1.special_defense,
@@ -293,6 +339,10 @@ export const saveGames = async ({
         game.is_ko = result.p2.defense <= 0;
       } else if (game.winner === 'p2') {
         game.is_ko = result.p1.defense <= 0;
+      }
+
+      if (game.bouts[game.bouts.length - 1].sudden_death) {
+        game.is_sudden_death = true;
       }
 
       if (i % 500 === 0) {
