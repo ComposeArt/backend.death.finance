@@ -62,11 +62,12 @@ const duel = ({
         const specialAttackCounter = randomIntFromInterval(0, maxSpecialAttack);
         const counterAttack = specialElementWeak ? specialAttackCounter - specialAttack : -1;
 
-        bout.special_attack = specialAttack;
+        bout.attack = specialAttack;
+        bout.counter_attack = 0;
 
         if (counterAttack >= 0) {
           if (p2Stats.special_defense > 0) {
-            bout.counter_special_attack = counterAttack;
+            bout.counter_attack = specialAttackCounter;
             p2Stats.special_defense = p2Stats.special_defense - counterAttack;
           }
 
@@ -85,10 +86,11 @@ const duel = ({
         const counterAttack = elementWeak ? attackCounter - attack : -1;
 
         bout.attack = attack;
+        bout.counter_attack = 0;
 
         if (counterAttack >= 0) {
           if (p2Stats.special_defense <= 0) {
-            bout.counter_attack = counterAttack;
+            bout.counter_attack = attackCounter;
             p2Stats.defense = p2Stats.defense - counterAttack;
           }
 
@@ -110,11 +112,12 @@ const duel = ({
         const specialAttackCounter = randomIntFromInterval(0, maxSpecialAttack);
         const counterAttack = specialElementWeak ? specialAttackCounter - specialAttack : -1;
 
-        bout.special_attack = specialAttack;
+        bout.attack = specialAttack;
+        bout.counter_attack = 0;
 
         if (counterAttack >= 0) {
           if (p1Stats.special_defense > 0) {
-            bout.counter_special_attack = counterAttack;
+            bout.counter_attack = specialAttackCounter;
             p1Stats.special_defense = p1Stats.special_defense - counterAttack;
           }
 
@@ -133,10 +136,11 @@ const duel = ({
         const counterAttack = elementWeak ? attackCounter - attack : -1;
 
         bout.attack = attack;
+        bout.counter_attack = 0;
 
         if (counterAttack >= 0) {
           if (p1Stats.special_defense <= 0) {
-            bout.counter_attack = counterAttack;
+            bout.counter_attack = attackCounter;
             p1Stats.defense = p1Stats.defense - counterAttack;
           }
 
@@ -160,35 +164,33 @@ const duel = ({
   } else {
     let winner = '';
 
-    if (p1Stats.defense === p2Stats.defense) {
-      const p1FinalAttack = randomIntFromInterval(0, p1Stats.attack + p1Stats.special_attack);
-      const p2FinalAttack = randomIntFromInterval(0, p2Stats.attack + p2Stats.special_attack);
+    if (p1Stats.defense > p2Stats.defense) {
+      winner = 'p1';
+    } else if (p2Stats.defense > p1Stats.defense) {
+      winner = 'p2';
+    } else {
+      winner = randomIntFromInterval(0, 1) ? 'p2' : 'p1';
+    }
 
-      if (p1FinalAttack > p2FinalAttack) {
-        winner = 'p1';
+    let fightString = '1';
 
-        bouts.push({
-          fighter: winner,
-          attack:p1FinalAttack,
-          sudden_death: true,
-        });
-      } else if (p1FinalAttack < p2FinalAttack) {
-        winner = 'p2';
-
-        bouts.push({
-          fighter: winner,
-          attack: p2FinalAttack,
-          sudden_death: true,
-        });
+    for (const b of bouts) {
+      if (b.fighter === 'p1') {
+        fightString = `${fightString}0`;
       } else {
-        winner = p2Turn ? 'p2' : 'p1';
-
-        bouts.push({
-          fighter: winner,
-          attack: Math.min(p2Turn ? p2FinalAttack : p1FinalAttack, 15),
-          sudden_death: true,
-        });
+        fightString = `${fightString}1`;
       }
+
+      const attackString = _.padStart(b.attack.toString(2), 4, '0');
+      const counterString = _.padStart(b.counter_attack.toString(2), 4, '0');
+
+      fightString = `${fightString}${attackString}${counterString}`;
+    }
+
+    if (winner === 'p1') {
+      fightString = `${fightString}0`;
+    } else {
+      fightString = `${fightString}1`;
     }
 
     return {
@@ -196,6 +198,7 @@ const duel = ({
       p2: p2Stats,
       winner,
       bouts,
+      fight: fightString,
     };
   }
 };
@@ -245,105 +248,8 @@ export const saveGames = async ({
       const game: any = {
         p1: p1.id,
         p2: p2.id,
-        winner: result.winner,
-        is_ko: false,
-        is_sudden_death: false,
-        p1_not_injured: result.p1.defense === p1.defense,
-        p2_not_injured: result.p2.defense === p2.defense,
-        p1_not_touched: result.p1.special_defense === p1.special_defense,
-        p2_not_touched: result.p2.special_defense === p2.special_defense,
-        p1_misses: 0,
-        p2_misses: 0,
-        p1_critical_hits: 0,
-        p2_critical_hits: 0,
-        p1_dodges: 0,
-        p2_dodges: 0,
-        p1_counter_attacks: 0,
-        p2_counter_attacks: 0,
-        p1_max_damage_dealt: 0,
-        p2_max_damage_dealt: 0,
-        bouts: result.bouts,
+        fight: result.fight,
       };
-
-      for (const bout of result.bouts) {
-        if (bout.fighter === 'p1') {
-          if (bout.special_attack > game.p1_max_damage_dealt) {
-            game.p1_max_damage_dealt = bout.special_attack;
-          }
-
-          if (bout.attack > game.p1_max_damage_dealt) {
-            game.p1_max_damage_dealt = bout.attack;
-          }
-
-          if (bout.counter_attack > game.p2_max_damage_dealt) {
-            game.p2_max_damage_dealt = bout.counter_attack;
-          }
-
-          if (bout.special_attack === 0) {
-            game.p1_misses++;
-          }
-
-          if (bout.attack === 0) {
-            game.p1_misses++;
-          }
-
-          if (bout.is_critical) {
-            game.p1_critical_hits++;
-          }
-
-          if (bout.is_dodged) {
-            game.p2_dodges++;
-          }
-
-          if (bout.counter_attack) {
-            game.p2_counter_attacks++;
-          }
-        }
-
-        if (bout.fighter === 'p2') {
-          if (bout.special_attack > game.p2_max_damage_dealt) {
-            game.p2_max_damage_dealt = bout.special_attack;
-          }
-
-          if (bout.attack > game.p2_max_damage_dealt) {
-            game.p2_max_damage_dealt = bout.attack;
-          }
-
-          if (bout.counter_attack > game.p1_max_damage_dealt) {
-            game.p1_max_damage_dealt = bout.counter_attack;
-          }
-
-          if (bout.special_attack === 0) {
-            game.p2_misses++;
-          }
-
-          if (bout.attack === 0) {
-            game.p2_misses++;
-          }
-
-          if (bout.is_critical) {
-            game.p2_critical_hits++;
-          }
-
-          if (bout.is_dodged) {
-            game.p1_dodges++;
-          }
-
-          if (bout.counter_attack) {
-            game.p1_counter_attacks++;
-          }
-        }
-      }
-
-      if (game.winner === 'p1') {
-        game.is_ko = result.p2.defense <= 0;
-      } else if (game.winner === 'p2') {
-        game.is_ko = result.p1.defense <= 0;
-      }
-
-      if (game.bouts[game.bouts.length - 1].sudden_death) {
-        game.is_sudden_death = true;
-      }
 
       if (i % 500 === 0) {
         const batch = db.batch();
