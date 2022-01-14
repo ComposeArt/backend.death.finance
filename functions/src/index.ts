@@ -22,3 +22,6 @@ const firebaseFunction = functions.region('us-central1');
 export const writeDeathGamesCollectionPlayers = firebaseFunction.firestore
   .document('nft-death-games/{season}/collections/{collection}/players/{player}')
   .onWrite((snap, context) => triggerFunctions.writeDeathGamesCollectionPlayers(admin, snap, context));
+
+export const simulateFight = firebaseFunction.https
+  .onCall((params, context) => triggerFunctions.simulateFight(admin, params, context));
