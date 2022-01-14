@@ -1,8 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { ethers } from "ethers";
-import FightClub from "./FightClub.json";
 
 const app = initializeApp({
     apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -16,29 +14,21 @@ connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateFight = httpsCallable(functions, 'simulateFight');
 
 const simulateFightFxn = async () => {
-    let provider = ethers.getDefaultProvider('goerli');
-    let fightClub = new ethers.Contract(
-      "0xc0BC1D18ad637121224646e112C9d4b6a014Ea63",
-      FightClub.abi,
-      provider
-    );
-    console.log(fightClub);
+    let eventLog:any = await simulateFight({
+        isSimulated: false,
+        fighterOneStats: 8337395,
+        fighterTwoStats: 8333282,
+        random: 123124,
+        blockNumber: 31
+    });
+    eventLog = eventLog.data;
 
-    let fighterOneStats = 8337395;
-    let fighterTwoStats = 8333282;
     const EVENT_SIZE = 9;
-    let eventLog = await fightClub.fight(true, fighterOneStats, fighterTwoStats, '47253922380151261668899214344815469786', 31);
-    eventLog = BigInt(ethers.utils.formatEther(eventLog).toString().replace(".", "")).toString(2);
     let isTie = (eventLog.length % EVENT_SIZE) == 1;
-    
     for(let i = 1; i < eventLog.length - 1; i+=EVENT_SIZE) {
         console.log(`${parseInt(eventLog.substring(i, i+1), 2) == 0 ? "P1 Attack:": "P2 Attack:"} ${parseInt(eventLog.substring(i+1, i+5), 2)}, ${parseInt(eventLog.substring(i, i+1), 2) == 0 ? "P2 Counter:": "P1 Counter:"} ${parseInt(eventLog.substring(i+5, i+EVENT_SIZE), 2)}`);
     }
     console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length-1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
-
-
-    const result = await simulateFight({ test: 'timmy' });
-    console.log(result);
 }
 
 simulateFightFxn()

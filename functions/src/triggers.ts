@@ -1,7 +1,10 @@
+require('dotenv').config()
 import _ from 'lodash';
 import moment from 'moment';
+import { ethers } from "ethers";
 
 import * as Games from './games';
+import FightClub from "./FightClub.json";
 
 export const writeDeathGamesCollectionPlayers = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -33,9 +36,21 @@ export const writeDeathGamesCollectionPlayers = async (admin: any, snap: any, co
   }
 };
 
-export const simulateFight = async (admin: any, { fighterOne, fighterTwo, random, blockNumber }: any, context?: any) => {
+export const simulateFight = async (admin: any, { isSimulated, fighterOneStats, fighterTwoStats, random, blockNumber }: any, context?: any) => {
   try {
-    return "thing";
+    const infuraProvider = new ethers.providers.InfuraProvider("goerli", process.env.INFURA_PROJECT_ID);
+    let wallet = new ethers.Wallet(`${process.env.DEPLOYER_PRIVATE_KEY}`, infuraProvider);
+    const signer = wallet.connect(infuraProvider);
+       
+    let fightClub = new ethers.Contract(
+      "0xc0BC1D18ad637121224646e112C9d4b6a014Ea63",
+      FightClub.abi,
+      signer
+    );
+    
+    let eventLog = await fightClub.fight(isSimulated, fighterOneStats, fighterTwoStats, random, blockNumber);
+    eventLog = BigInt(ethers.utils.formatEther(eventLog).toString().replace(".", "")).toString(2);
+    return eventLog;
     // const current = date ? moment(date, 'YYYY-MM-DD') : moment();
 
     // const db = admin.firestore();
