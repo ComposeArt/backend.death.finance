@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 
 import * as triggerFunctions from './triggers';
+import * as registrationFunctions from './registration';
 
 admin.initializeApp(functions.config().firebase);
 
@@ -19,6 +20,9 @@ const firebaseFunction = functions.region('us-central1');
 //      TRIGGERS      //
 // ------------------ //
 
-// THis should be moved to it's own thing
+// This should be moved to it's own thing
 export const simulateFight = firebaseFunction.https
   .onCall((params, context) => triggerFunctions.simulateFight(admin, params, context));
+
+export const registerFighter = firebaseFunction.https
+  .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
