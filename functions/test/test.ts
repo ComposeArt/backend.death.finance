@@ -15,7 +15,7 @@ const simulateFight = httpsCallable(functions, 'simulateFight');
 
 const simulateFightFxn = async () => {
     let eventLog:any = await simulateFight({
-        isSimulated: false,
+        isSimulated: true,
         fighterOneStats: 8337395,
         fighterTwoStats: 8333282,
         random: 123124,

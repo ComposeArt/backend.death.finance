@@ -11,14 +11,14 @@
     "test": "npx ts-node test/test.ts"
   },
   "engines": {
-    "node": ">=12"
+    "node": "14"
   },
   "main": "lib/index.js",
   "dependencies": {
     "accounting": "^0.4.1",
-    "coingecko-api": "^1.0.10",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "ethers": "^5.5.3",
     "firebase": "^9.6.3",
     "firebase-admin": "^9.8.0",
     "firebase-functions": "^3.14.1",
@@ -32,14 +32,13 @@
   },
   "devDependencies": {
     "@types/accounting": "^0.4.1",
+    "@types/node": "14.18.3",
     "@types/node-fetch": "^2.5.4",
     "@types/qs": "^6.9.1",
     "@types/uuid": "^7.0.2",
-    "@types/node": "14.18.3",
     "firebase-functions-test": "^0.1.6",
     "tslint": "^5.12.0",
-    "typescript": "^3.2.2",
-    "ethers": "^5.5.1"
+    "typescript": "^3.2.2"
   },
   "private": true
 }
