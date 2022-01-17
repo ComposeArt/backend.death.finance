@@ -1,6 +1,12 @@
+require('dotenv').config();
+
 import { initializeApp } from "firebase/app";
+
 import { getApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
+
+import { ethers } from 'ethers';
+import FightClub from './FightClub.json';
 
 const app = initializeApp({
     apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -14,15 +20,28 @@ connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateFight = httpsCallable(functions, 'simulateFight');
 
 const simulateFightFxn = async () => {
-    let eventLog:any = await simulateFight({
-        isSimulated: true,
-        fighterOneStats: 8337395,
-        fighterTwoStats: 8333282,
-        random: 123124,
-        blockNumber: 31
-    });
-    eventLog = eventLog.data;
 
+    let response:any = await simulateFight({
+        isSimulated: false,
+        fighterOneStats: 14325810,
+        fighterTwoStats: 6627840,
+        random: '47253922380151261668899214344815469786',
+        blockNumber: '31'
+    });
+    response = response.data;
+
+    let secondaryResponse:any = await simulateFight({
+        isSimulated: true,
+        fighterOneStats: 14325810,
+        fighterTwoStats: 6627840,
+        random: response.randomness.toString(),
+        blockNumber: response.blockNumber.toString()
+    });
+
+    secondaryResponse = secondaryResponse.data;
+    console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
+
+    let eventLog = response.eventLog;
     const EVENT_SIZE = 9;
     let isTie = (eventLog.length % EVENT_SIZE) == 1;
     for(let i = 1; i < eventLog.length - 1; i+=EVENT_SIZE) {

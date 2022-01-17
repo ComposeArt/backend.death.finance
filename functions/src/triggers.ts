@@ -15,15 +15,21 @@ export const simulateFight = async (admin: any, { isSimulated, fighterOneStats, 
     const signer = wallet.connect(infuraProvider);
 
     const fightClub = new ethers.Contract(
-      '0x4B09C49022529EbA8524761d283863adA05861c1',
+      '0x33a0c80a56af8156C40b987721fC9898785a0cCd',
       FightClub.abi,
       signer
     );
 
     let eventLog = await fightClub.fight(isSimulated, fighterOneStats, fighterTwoStats, random, blockNumber);
     eventLog = BigInt((eventLog).toString().replace('.', '')).toString(2);
+    const currentBlock = isSimulated ? blockNumber : (await infuraProvider.getBlock(await infuraProvider.getBlockNumber())).number;
+    const randomness = isSimulated ? random : (await fightClub.getRandomness()).toString();
 
-    return eventLog;
+    return {
+      eventLog,
+      blockNumber: currentBlock,
+      randomness
+    };
   } catch (error) {
     console.error(error);
     throw new functions.https.HttpsError('failed-precondition', 'simulation failed');
