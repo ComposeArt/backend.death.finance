@@ -15,13 +15,13 @@ export const simulateFight = async (admin: any, { isSimulated, fighterOneStats, 
     const signer = wallet.connect(infuraProvider);
 
     const fightClub = new ethers.Contract(
-      '0xc0BC1D18ad637121224646e112C9d4b6a014Ea63',
+      '0x4B09C49022529EbA8524761d283863adA05861c1',
       FightClub.abi,
       signer
     );
 
     let eventLog = await fightClub.fight(isSimulated, fighterOneStats, fighterTwoStats, random, blockNumber);
-    eventLog = BigInt(ethers.utils.formatEther(eventLog).toString().replace('.', '')).toString(2);
+    eventLog = BigInt((eventLog).toString().replace('.', '')).toString(2);
 
     return eventLog;
   } catch (error) {
