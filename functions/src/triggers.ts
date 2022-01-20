@@ -38,7 +38,7 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
       const signer = wallet.connect(infuraProvider);
 
       const fightClub = new ethers.Contract(
-        '0x887b7132bA90851596fF87056F44579832452a28',
+        '0xfE891216cFa520997271ad892833b514b9422AF5',
         FightClub.abi,
         signer
       );
