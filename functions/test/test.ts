@@ -26,17 +26,29 @@ const simulateFightFxn = async () => {
 
     let response:any = await simulateFight({
         isSimulated: false,
-        fighterOneStats: 14325810,
-        fighterTwoStats: 6627840,
-        random: '47253922380151261668899214344815469786',
-        blockNumber: '31'
+        f1: {
+            collection: 'minitaurs-reborn',
+            id: '182521675',
+        },
+        f2: {
+            collection: 'galaktic-gang',
+            id: '150340670',
+        },
+        random: '1',
+        blockNumber: '1'
     });
     response = response.data;
 
     let secondaryResponse:any = await simulateFight({
         isSimulated: true,
-        fighterOneStats: 14325810,
-        fighterTwoStats: 6627840,
+        f1: {
+            collection: 'minitaurs-reborn',
+            id: '182521675',
+        },
+        f2: {
+            collection: 'galaktic-gang',
+            id: '150340670',
+        },
         random: response.randomness.toString(),
         blockNumber: response.blockNumber.toString()
     });
