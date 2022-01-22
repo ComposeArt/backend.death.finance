@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 
-import * as triggerFunctions from './triggers';
+import * as simulateFunctions from './simulate';
 import * as registrationFunctions from './registration';
 
 admin.initializeApp(functions.config().firebase);
@@ -20,9 +20,20 @@ const firebaseFunction = functions.region('us-central1');
 //      TRIGGERS      //
 // ------------------ //
 
-// This should be moved to it's own thing
+// export const onCreateFighter = firebaseFunction.firestore
+//   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
+//   .onCreate((snap, context) => triggerFunctions.onCreateFighter(admin, snap, context));
+
+// export const onWriteFighter = firebaseFunction.firestore
+//   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
+//   .onWrite((snap, context) => triggerFunctions.onWriteFighter(admin, snap, context));
+
+// ------------------ //
+//      CALLABLE      //
+// ------------------ //
+
 export const simulateFight = firebaseFunction.https
-  .onCall((params, context) => triggerFunctions.simulateFight(admin, params, context));
+  .onCall((params, context) => simulateFunctions.simulateFight(admin, params, context));
 
 export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
