@@ -133,10 +133,21 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
         simulation,
       };
     } else {
-      throw new functions.https.HttpsError('failed-precondition', 'simulation failed');
+      throw new Error('invalid fighters');
     }
   } catch (error) {
-    console.error(error);
-    throw new functions.https.HttpsError('failed-precondition', 'simulation failed');
+    const msg = getErrorMessage(error);
+
+    throw new functions.https.HttpsError('internal', msg || 'simulation failed');
   }
+};
+
+const getErrorMessage = (error: unknown) => {
+  console.log(error);
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return '';
 };
