@@ -6,6 +6,8 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, pl
   const db = admin.firestore();
 
   try {
+    const owner = ownerAddress.toLowerCase();
+
     const unRegisteredPlayer = await db.collection('nft-death-games')
       .doc('season_0')
       .collection('collections')
@@ -14,8 +16,8 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, pl
       .doc(String(playerId))
       .get();
 
-    const openseaData = unRegisteredPlayer.data();
-    const isOwner = await isCorrectOwner(openseaData.permalink, ownerAddress);
+    const playerData = unRegisteredPlayer.data();
+    const isOwner = await isCorrectOwner(playerData.permalink, owner);
 
     if (!isOwner) {
       throw new functions
@@ -23,37 +25,29 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, pl
         .HttpsError('invalid-argument', 'not the owner');
     }
 
-    try {
-      const fightersRef = await db.collection('nft-death-games')
-        .doc('season_0')
-        .collection('fighters');
+    const fightersRef = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('fighters');
 
-      const existingPlayersQuery = await fightersRef
-        .where('player', '==', String(playerId))
-        .get();
+    const existingPlayersQuery = await fightersRef
+      .doc(String(playerId))
+      .get();
 
-      const playerAlreadyRegistered = !existingPlayersQuery.empty;
-
-      if (playerAlreadyRegistered) {
-        throw new functions
-          .https
-          .HttpsError('invalid-argument', 'fighter already registered');
-      } else {
-        fightersRef
-          .doc()
-          .set({
-            collection,
-            owner: ownerAddress,
-            player: String(playerId),
-            timestamp: moment().format('x'),
-            opensea: openseaData,
-          });
-      }
-    } catch (error) {
-      console.log('Error saving new fighter:', error);
+    if (!existingPlayersQuery.exists) {
+      await fightersRef
+        .doc(String(playerId))
+        .set({
+          collection,
+          owner,
+          id: String(playerId),
+          timestamp: moment().format('x'),
+          player: playerData,
+        });
     }
   } catch (error) {
-    console.log('Error retrieving player:', error);
+    throw new functions
+    .https
+    .HttpsError('failed-precondition', 'failed to register fighter');
   }
 };
 
@@ -70,6 +64,7 @@ const isCorrectOwner = async (fighterLink: any, ownerAddress: any) => {
   });
   const asJson = await checkOwnershipResult.json();
   const openSeaOwnerAddress = asJson.owner.address;
+
   const isOwner = ownerAddress === openSeaOwnerAddress;
 
   return isOwner;
