@@ -1,12 +1,7 @@
 require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
-
-import { getApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-
-import { ethers } from 'ethers';
-import FightClub from './FightClub.json';
 
 const app = initializeApp({
     apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -18,6 +13,14 @@ const app = initializeApp({
 const functions = getFunctions(app);
 connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateFight = httpsCallable(functions, 'simulateFight');
+const registerFighter = httpsCallable(functions, 'registerFighter');
+
+const registerFighterFxn = async () => {
+    const result = await registerFighter({ ownerAddress: '0x5bf79ed30cf295401e2bdfc4431af8b1cdf038f1', collection: 'flowtys', playerId: 45194744}).catch((error) => {
+        console.log("registerFighterFxn received error %s", error);
+    });
+    console.log("registerFighterFxn result: %s", result);
+};
 
 const simulateFightFxn = async () => {
 
@@ -61,5 +64,5 @@ const simulateFightFxn = async () => {
     }
     console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length-1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
 }
-
 simulateFightFxn()
+registerFighterFxn()
