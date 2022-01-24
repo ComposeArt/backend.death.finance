@@ -2,7 +2,7 @@ import moment from 'moment';
 import fetch from 'node-fetch';
 import * as functions from 'firebase-functions';
 
-export const registerFighter = async (admin: any, { ownerAddress, collection, playerId }: any, context: any) => {
+export const registerFighter = async (admin: any, { ownerAddress, collection, contract, token_id, playerId }: any, context: any) => {
   const db = admin.firestore();
 
   try {
@@ -16,26 +16,74 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, pl
       .doc(String(playerId))
       .get();
 
-    if (!unRegisteredPlayer.exists) {
-      throw new Error('NFT not included this season');
+    const openseaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
+      headers: {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
+      }
+    });
+
+    const openseaData = await openseaResult.json();
+
+    if (String(openseaData.id) !== String(playerId) || openseaData.collection.slug !== collection) {
+      throw new Error('looks like your cheating');
     }
 
-    const playerData = unRegisteredPlayer.data();
-    const isOwner = await isCorrectOwner(playerData.permalink, owner);
+    const fightersRef = await db.collection('nft-death-games').doc('season_0').collection('fighters');
 
-    if (!isOwner) {
-      throw new Error('not the owner');
-    }
+    if (unRegisteredPlayer.exists) {
+      const playerData = unRegisteredPlayer.data();
 
-    const fightersRef = await db.collection('nft-death-games')
-      .doc('season_0')
-      .collection('fighters');
+      const openSeaOwnerAddress = openseaData.owner.address;
 
-    const existingPlayersQuery = await fightersRef
-      .doc(String(playerId))
-      .get();
+      const isOwner = ownerAddress === openSeaOwnerAddress;
 
-    if (!existingPlayersQuery.exists) {
+      if (!isOwner) {
+        throw new Error('not the owner');
+      }
+
+      const existingPlayersQuery = await fightersRef
+        .doc(String(playerId))
+        .get();
+
+      if (!existingPlayersQuery.exists) {
+        await fightersRef
+          .doc(String(playerId))
+          .set({
+            collection,
+            owner,
+            id: String(playerId),
+            timestamp: moment().format('x'),
+            player: playerData,
+            is_doping: playerData.power === 84,
+          });
+
+        await await db.collection('nft-death-games')
+          .doc('season_0')
+          .collection('collections')
+          .doc(collection)
+          .collection('players')
+          .doc(String(playerId))
+          .update({
+            owner,
+          });
+      } else {
+        await fightersRef
+          .doc(String(playerId))
+          .update({
+            owner,
+          });
+
+        await await db.collection('nft-death-games')
+          .doc('season_0')
+          .collection('collections')
+          .doc(collection)
+          .collection('players')
+          .doc(String(playerId))
+          .update({
+            owner,
+          });
+      }
+    } else {
       await fightersRef
         .doc(String(playerId))
         .set({
@@ -43,17 +91,19 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, pl
           owner,
           id: String(playerId),
           timestamp: moment().format('x'),
-          player: playerData,
-        });
-
-      await await db.collection('nft-death-games')
-        .doc('season_0')
-        .collection('collections')
-        .doc(collection)
-        .collection('players')
-        .doc(String(playerId))
-        .update({
-          owner,
+          is_invalid: true,
+          player: {
+            id: String(playerId),
+            token_id,
+            image_url: openseaData.image_url,
+            image_preview_url: openseaData.image_preview_url,
+            image_thumbnail_url: openseaData.image_thumbnail_url,
+            name: openseaData.name,
+            description: openseaData.description,
+            permalink: openseaData.permalink,
+            collection,
+            season: 'season_0',
+          },
         });
     }
   } catch (error) {
@@ -71,23 +121,4 @@ const getErrorMessage = (error: unknown) => {
   }
 
   return '';
-};
-
-const isCorrectOwner = async (fighterLink: any, ownerAddress: any) => {
-  // Get characters from "0x" to end of URL. The URL doesn't specify
-  // collection names, so there isn't a risk of collision on a collection name containing "0x".
-  const beginIndex = fighterLink.indexOf('0x');
-  const fighterAddress = fighterLink.slice(-(fighterLink.length - beginIndex));
-
-  const checkOwnershipResult = await fetch(`https://api.opensea.io/api/v1/asset/${fighterAddress}`, {
-    headers: {
-      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
-    }
-  });
-  const asJson = await checkOwnershipResult.json();
-  const openSeaOwnerAddress = asJson.owner.address;
-
-  const isOwner = ownerAddress === openSeaOwnerAddress;
-
-  return isOwner;
 };
