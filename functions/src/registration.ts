@@ -45,6 +45,14 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
         .doc(String(playerId))
         .get();
 
+      await await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(owner)
+        .set({
+          address: owner,
+        }, { merge: true });
+
       if (!existingPlayersQuery.exists) {
         await fightersRef
           .doc(String(playerId))
@@ -54,7 +62,8 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
             id: String(playerId),
             timestamp: moment().format('x'),
             player: playerData,
-            is_doping: playerData.power === 84,
+            is_doping: playerData.power >= 79,
+            is_invalid: false,
           });
 
         await await db.collection('nft-death-games')
@@ -92,6 +101,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
           id: String(playerId),
           timestamp: moment().format('x'),
           is_invalid: true,
+          is_doping: false,
           player: {
             id: String(playerId),
             token_id,

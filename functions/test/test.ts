@@ -66,3 +66,10 @@ const simulateFightFxn = async () => {
 }
 simulateFightFxn()
 registerFighterFxn()
+
+
+// Randomness Example
+// let userRandomness = await fightClub.getUserRandomness(signer);
+// let contractRandomness = await fightClub.getRandomness();
+// console.log('userRandomness: ', userRandomness);
+// console.log('contractRandomness: ', contractRandomness);
