@@ -16,15 +16,15 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
       .doc(String(playerId))
       .get();
 
-    const openseaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
+    const openSeaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
       headers: {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
       }
     });
 
-    const openseaData = await openseaResult.json();
+    const openSeaData = await openSeaResult.json();
 
-    if (String(openseaData.id) !== String(playerId) || openseaData.collection.slug !== collection) {
+    if (String(openSeaData.id) !== String(playerId) || openSeaData.collection.slug !== collection) {
       throw new Error('looks like your cheating');
     }
 
@@ -33,7 +33,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
     if (unRegisteredPlayer.exists) {
       const playerData = unRegisteredPlayer.data();
 
-      const openSeaOwnerAddress = openseaData.owner.address;
+      const openSeaOwnerAddress = openSeaData.owner.address;
 
       const isOwner = ownerAddress === openSeaOwnerAddress;
 
@@ -105,12 +105,12 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
           player: {
             id: String(playerId),
             token_id,
-            image_url: openseaData.image_url,
-            image_preview_url: openseaData.image_preview_url,
-            image_thumbnail_url: openseaData.image_thumbnail_url,
-            name: openseaData.name,
-            description: openseaData.description,
-            permalink: openseaData.permalink,
+            image_url: openSeaData.image_url,
+            image_preview_url: openSeaData.image_preview_url,
+            image_thumbnail_url: openSeaData.image_thumbnail_url,
+            name: openSeaData.name,
+            description: openSeaData.description,
+            permalink: openSeaData.permalink,
             collection,
             season: 'season_0',
           },
