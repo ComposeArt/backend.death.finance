@@ -40,5 +40,5 @@ export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
 
 export const updateGoerli = firebaseFunction.pubsub
-  .schedule('every 5 seconds')
+  .schedule('every 1 minutes')
   .onRun(async () => scheduleFunctions.updateGoerli(admin));
