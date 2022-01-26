@@ -45,7 +45,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
         .doc(String(playerId))
         .get();
 
-      await await db.collection('nft-death-games')
+      await db.collection('nft-death-games')
         .doc('season_0')
         .collection('users')
         .doc(owner)
@@ -66,7 +66,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
             is_invalid: false,
           });
 
-        await await db.collection('nft-death-games')
+        await db.collection('nft-death-games')
           .doc('season_0')
           .collection('collections')
           .doc(collection)
@@ -82,7 +82,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
             owner,
           });
 
-        await await db.collection('nft-death-games')
+        await db.collection('nft-death-games')
           .doc('season_0')
           .collection('collections')
           .doc(collection)
