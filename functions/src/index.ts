@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 
 import * as simulateFunctions from './simulate';
 import * as registrationFunctions from './registration';
+import * as scheduleFunctions from './scheduled';
 
 admin.initializeApp(functions.config().firebase);
 
@@ -37,3 +38,7 @@ export const simulateFight = firebaseFunction.https
 
 export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
+
+export const updateGoerli = firebaseFunction.pubsub
+  .schedule('every 5 seconds')
+  .onRun(async () => scheduleFunctions.updateGoerli(admin));
