@@ -4,6 +4,7 @@ import * as functions from 'firebase-functions';
 import * as simulateFunctions from './simulate';
 import * as registrationFunctions from './registration';
 import * as scheduleFunctions from './scheduled';
+import * as triggerFunctions from './triggers';
 
 admin.initializeApp(functions.config().firebase);
 
@@ -13,17 +14,21 @@ const firebaseFunction = functions.region('us-central1');
 //     SCHEDULED     //
 // ----------------- //
 
-// export const dataDump = firebaseFunction.pubsub
-//   .schedule('every day 00:00')
-//   .onRun(async () => scheduleFunctions.dataDump(admin));
+export const updateGoerli = firebaseFunction.pubsub
+    .schedule('every 1 minutes')
+    .onRun(async () => scheduleFunctions.updateGoerli(admin));
 
 // ------------------ //
 //      TRIGGERS      //
 // ------------------ //
 
-// export const onCreateFighter = firebaseFunction.firestore
-//   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-//   .onCreate((snap, context) => triggerFunctions.onCreateFighter(admin, snap, context));
+export const onCreateFighter = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/fighters/{fighterId}')
+  .onCreate((snap, context) => triggerFunctions.createFighterImage(admin, snap, context));
+
+export const fighterUpdated = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/fighters/{fighterId}')
+  .onUpdate(async (change, context) => await triggerFunctions.figherUpdated(change, context, admin));
 
 // export const onWriteFighter = firebaseFunction.firestore
 //   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
@@ -39,6 +44,3 @@ export const simulateFight = firebaseFunction.https
 export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
 
-export const updateGoerli = firebaseFunction.pubsub
-  .schedule('every 1 minutes')
-  .onRun(async () => scheduleFunctions.updateGoerli(admin));
