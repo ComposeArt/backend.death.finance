@@ -16,10 +16,39 @@ const simulateFight = httpsCallable(functions, 'simulateFight');
 const registerFighter = httpsCallable(functions, 'registerFighter');
 
 const registerFighterFxn = async () => {
-    const result = await registerFighter({ ownerAddress: '0x5bf79ed30cf295401e2bdfc4431af8b1cdf038f1', collection: 'flowtys', playerId: 45194744}).catch((error) => {
-        console.log("registerFighterFxn received error %s", error);
-    });
-    console.log("registerFighterFxn result: %s", result);
+  const result = await registerFighter({
+    ownerAddress: '0xe2b9f0757a9e2813fae323aefd89ec8be706104a',
+    collection: 'flowtys',
+    contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
+    token_id: '7910',
+    playerId: 56020219
+  }).catch((error) => {
+    console.log("registerFighterFxn received error %s", getErrorMessage(error));
+  });
+  console.log("registerFighterFxn result: %s", result);
+};
+
+const registerAnotherFighterFxn = async () => {
+  const result = await registerFighter({
+    ownerAddress: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
+    collection: 'flowtys',
+    contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
+    token_id: '2413',
+    playerId: 56003240
+  }).catch((error) => {
+    console.log("registerAnotherFighterFxn received error %s", getErrorMessage(error));
+  });
+  console.log("registerAnotherFighterFxn result: %s", result);
+};
+
+const getErrorMessage = (error: unknown) => {
+  console.log(error);
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return '';
 };
 
 const simulateFightFxn = async () => {
@@ -66,6 +95,7 @@ const simulateFightFxn = async () => {
 }
 simulateFightFxn()
 registerFighterFxn()
+registerAnotherFighterFxn()
 
 
 // Randomness Example
