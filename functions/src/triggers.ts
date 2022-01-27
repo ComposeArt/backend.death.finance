@@ -92,7 +92,7 @@ const updateProfileImage = async (db: any, storage: any, fighter: any) => {
   const exists = await file.exists();
 
   if (!exists[0]) {
-    if (players.length == 1) {
+    if (players.length === 1) {
       image = await nodeHtmlToImage({
         html: `
             <html>
@@ -116,9 +116,9 @@ const updateProfileImage = async (db: any, storage: any, fighter: any) => {
         `
         });
     } else {
-      if (players.length == 2) {
+      if (players.length === 2) {
         players = players.concat([players[1], players[0]]);
-      } else if (players.length == 3) {
+      } else if (players.length === 3) {
         players = players.push(players[0]);
       }
 
@@ -177,7 +177,8 @@ const updateCollectionImage = async (db: any, storage: any, fighter: any) => {
     .limit(4)
     .get();
 
-  let players: any = [];
+  const players: any = [];
+
   playerDocs.forEach(async (playerDoc: any) => {
     if (players.length < 4) {
       players.push(playerDoc.data());
@@ -293,10 +294,10 @@ const updateMatchImage = async (db: any, storage: any, match: any) => {
 
 export const updateFighterImage = async (db: any, storage: any, fighter: any) => {
   try {
-    if (fighter != undefined) {
+    if (fighter !== undefined) {
       fighter = fighter.player;
 
-      if (fighter != undefined) {
+      if (fighter !== undefined) {
         const bucket = storage.bucket();
         const fileName = `fighters/${fighter.id}.png`;
         const file = bucket.file(fileName);

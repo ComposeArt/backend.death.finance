@@ -1,6 +1,5 @@
-export declare const simulateFight: (admin: any, { isSimulated, f1, f2, random, blockNumber }: any, context?: any) => Promise<{
-    eventLog: any;
-    blockNumber: any;
-    randomness: any;
-    simulation: any;
-}>;
+export declare const createMatch: (admin: any, snap: any, context: any) => Promise<void>;
+export declare const createFighter: (admin: any, snap: any, context: any) => Promise<void>;
+export declare const updateMatch: (change: any, context: any, admin: any) => Promise<void>;
+export declare const updateFighter: (change: any, context: any, admin: any) => Promise<void>;
+export declare const updateFighterImage: (db: any, storage: any, fighter: any) => Promise<void>;
