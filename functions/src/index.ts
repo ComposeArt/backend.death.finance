@@ -15,8 +15,8 @@ const firebaseFunction = functions.region('us-central1');
 // ----------------- //
 
 export const updateGoerli = firebaseFunction.pubsub
-    .schedule('every 1 minutes')
-    .onRun(async () => scheduleFunctions.updateGoerli(admin));
+  .schedule('every 1 minutes')
+  .onRun(async () => scheduleFunctions.updateGoerli(admin));
 
 // ------------------ //
 //      TRIGGERS      //
@@ -24,19 +24,19 @@ export const updateGoerli = firebaseFunction.pubsub
 
 export const onCreateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-  .onCreate((snap, context) => triggerFunctions.createFighterImage(admin, snap, context));
+  .onCreate((snap, context) => triggerFunctions.createFighter(admin, snap, context));
+
+export const onUpdateFighter = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/fighters/{fighterId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateFighter(change, context, admin));
 
 export const onCreateMatch = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/matches/{matchId}')
-  .onCreate((snap, context) => triggerFunctions.createMatchImage(admin, snap, context));
+  .onCreate((snap, context) => triggerFunctions.createMatch(admin, snap, context));
 
-export const fighterUpdated = firebaseFunction.firestore
-  .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-  .onUpdate(async (change, context) => await triggerFunctions.fighterUpdated(change, context, admin));
-
-// export const onWriteFighter = firebaseFunction.firestore
-//   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-//   .onWrite((snap, context) => triggerFunctions.onWriteFighter(admin, snap, context));
+export const onUpdateMatch = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/matches/{matchId}')
+  .onCreate((snap, context) => triggerFunctions.updateMatch(admin, snap, context));
 
 // ------------------ //
 //      CALLABLE      //
