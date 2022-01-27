@@ -26,9 +26,13 @@ export const onCreateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
   .onCreate((snap, context) => triggerFunctions.createFighterImage(admin, snap, context));
 
+export const onCreateMatch = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/matches/{matchId}')
+  .onCreate((snap, context) => triggerFunctions.createMatchImage(admin, snap, context));
+
 export const fighterUpdated = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-  .onUpdate(async (change, context) => await triggerFunctions.figherUpdated(change, context, admin));
+  .onUpdate(async (change, context) => await triggerFunctions.fighterUpdated(change, context, admin));
 
 // export const onWriteFighter = firebaseFunction.firestore
 //   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
