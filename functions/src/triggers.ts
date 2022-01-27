@@ -19,7 +19,7 @@ export const createFighter = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
   const fighter = snap.after.data() || {};
 
-  registrationFunctions.schedulePreSeasonMatches(admin, snap, context);
+  registrationFunctions.schedulePreSeasonMatches(admin, snap);
 
   try {
     await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({

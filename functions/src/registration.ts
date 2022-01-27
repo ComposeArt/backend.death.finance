@@ -157,7 +157,6 @@ const getErrorMessage = (error: unknown) => {
 export const schedulePreSeasonMatches = async (
   admin: any,
   snapshot: any,
-  _: any
 ) => {
   const db = admin.firestore();
 
