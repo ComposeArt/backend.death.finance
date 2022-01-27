@@ -1,6 +1,60 @@
 import _ from 'lodash';
 import nodeHtmlToImage from 'node-html-to-image';
-import * as functions from 'firebase-functions';
+
+export const createMatchImage = async (admin: any, snap: any, context: any) => {
+    const db = admin.firestore();
+    const storage = admin.storage();
+    let match = snap.after.data() || {};
+
+    try {
+
+        const bucket = storage.bucket();
+        const fileName = `matches/${match.id}.png`;
+        const file = bucket.file(fileName);
+        const exists = await file.exists();
+
+        if (!exists[0]) {
+
+            const name1 = `${match.player1.collection} #${_.truncate(match.player1.token_id, { length: 7 })}`;
+            const name2 = `${match.player2.collection} #${_.truncate(match.player2.token_id, { length: 7 })}`;
+
+            const image = await nodeHtmlToImage({
+                output: './match.png',
+                html: `
+                <html>
+                    <head>
+                    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono">
+                    </head>
+                    <body style="width: 1024px; height: 512px;">
+                    <div style="width: 256px; height: 256px; position: absolute; z-index: 10; left: 384px; top: 128px;">
+                        <img style="width: 256px; height: 256px;" src="https://death.finance/fight-club-logo-light.png" />
+                    </div>
+                    <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 508px; height: 80px; position: absolute; z-index: 10; left: 0; bottom: 100px;">
+                        ${name1}
+                    </div>
+                    <div style=" font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 508px; height: 80px; position: absolute; z-index: 10; right: 0; bottom: 100px;">
+                        ${name2}
+                    </div>
+                    <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
+                        <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
+                        <img style="width: 508px; height: 508px; opacity: 0.6;" src="${match.player1.image_url}" />
+                        </div>
+                        <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
+                        <img style="width: 508px; height: 508px; opacity: 0.6;" src="${match.player2.image_url}" />
+                        </div>
+                    </div>
+                    </body>
+                </html>
+                `
+            });
+
+            await file.save(image, { contentType: 'image/png' });
+            await file.makePublic();
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 export const createFighterImage = async (admin: any, snap: any, context: any) => {
     const db = admin.firestore();
@@ -133,7 +187,6 @@ const updateProfileImage = async (db: any, storage: any, fighter: any) => {
             }
 
             image = await nodeHtmlToImage({
-            output: './profile.png',
             html: `
                 <html>
                 <head>
@@ -180,6 +233,71 @@ const updateProfileImage = async (db: any, storage: any, fighter: any) => {
 };
 
 const updateCollectionImage = async (db: any, storage: any, fighter: any) => { 
+    const playerDocs = await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('collections')
+        .doc(fighter.collection)
+        .collection('players')
+        .limit(4)
+        .get();
+
+    let players: any = [];
+    playerDocs.forEach(async (playerDoc: any) => {
+        if (players.length < 4)
+        players.push(playerDoc.data());
+    });
+
+    let image = null;
+    const bucket = storage.bucket();
+    const fileName = `collections/${fighter.collection}.png`;
+    const file = bucket.file(fileName);
+    const exists = await file.exists();
+
+    if (!exists[0]) {
+
+        image = await nodeHtmlToImage({
+            output: './collection.png',
+            html: `
+            <html>
+                <head>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono">
+                </head>
+                <body style="width: 1024px; height: 512px;">
+                <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
+                    <div width: 256px; height: 512px; display: flex; flex-direction: column;">
+                    <div style="width: 254px; height: 254px; border: 2px solid #1A202C; ">
+                        <img style="width: 254px; height: 254px; opacity: 0.6;" src="${players[0].image_url}" />
+                    </div>
+                    <div style="width: 254px; height: 254px; border: 2px solid #1A202C; ">
+                        <img style="width: 254px; height: 254px; opacity: 0.6;" src="${players[1].image_url}" />
+                    </div>
+                    </div>
+                    <div width: 256px; height: 512px; display: flex; flex-direction: column;">
+                    <div style="width: 254px; height: 254px; border: 2px solid #1A202C; ">
+                        <img style="width: 254px; height: 254px; opacity: 0.6;" src="${players[2].image_url}" />
+                    </div>
+                    <div style="width: 254px; height: 254px; border: 2px solid #1A202C; ">
+                        <img style="width: 254px; height: 254px; opacity: 0.6;" src="${players[3].image_url}" />
+                    </div>
+                    </div>
+                    <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 512px; height: 80px; position: absolute; z-index: 10; left: 0; bottom: 100px;">
+                    ${fighter.collection}
+                    </div>
+                    <div style="width: 512px; height: 512px;">
+                    <img style="width: 256px; height: 256px; position: absolute; top: 100px; right: 128px;" src="https://death.finance/fight-club-logo-light.png" />
+                    <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 512px; height: 80px; position: absolute; z-index: 10; left: 512px; bottom: 100px;">
+                        death.finance
+                    </div>
+                    </div>
+                </div>
+                </body>
+            </html>
+            `
+        });
+        await file.save(image, { contentType: 'image/png' });
+        await file.makePublic();
+    }
+
     await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
         'updateCollection': false
     });
