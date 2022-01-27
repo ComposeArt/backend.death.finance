@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import nodeHtmlToImage from 'node-html-to-image';
+import * as registrationFunctions from './registration';
 
 export const createMatch = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -17,6 +18,8 @@ export const createMatch = async (admin: any, snap: any, context: any) => {
 export const createFighter = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
   const fighter = snap.after.data() || {};
+
+  registrationFunctions.schedulePreSeasonMatches(admin, snap, context);
 
   try {
     await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({

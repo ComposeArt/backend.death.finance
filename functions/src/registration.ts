@@ -153,3 +153,82 @@ const getErrorMessage = (error: unknown) => {
 
   return '';
 };
+
+export const schedulePreSeasonMatches = async (
+  admin: any,
+  snapshot: any,
+  _: any
+) => {
+  const db = admin.firestore();
+
+  const newFighter = snapshot.data();
+  console.log("Scheduling pre-season fights for fighter %s", newFighter);
+
+  const allFighterSnapshot = await db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('fighters')
+    .where('is_doping', '==', false)
+    .where('is_invalid', '==', false)
+    .where('id', '!=', newFighter.id)
+    .get();
+
+  var currentBlock = await getCurrentBlockNumber(db);
+
+  const allFighters = allFighterSnapshot.docs.map((fighter: any) => fighter.data());
+  // TODO: Parallelize these writes https://github.com/ComposeArt/backend/issues/8
+  allFighters.forEach(async (otherFighter: any) => {
+    if (currentBlock % 5 === 0) {
+      currentBlock += 1;
+    }
+    const matchesCollection = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('matches');
+
+    // Each preseason matchup gets two fights. Here's first.
+    const firstMatch = await matchesCollection
+      .doc(`${newFighter.id}-${otherFighter.id}`)
+      .get();
+    if (!firstMatch.exists) {
+      await scheduleMatch(db, newFighter, otherFighter, currentBlock);
+      currentBlock += 1;
+    }
+
+    // Second matchup between the same fighters.
+    const secondMatch = await matchesCollection
+      .doc(`${newFighter.id}-${otherFighter.id}`)
+      .get();
+    if (!secondMatch.exists) {
+      await scheduleMatch(db, otherFighter, newFighter, currentBlock);
+      currentBlock += 1;
+    }
+  });
+};
+
+const getCurrentBlockNumber = async (db: any): Promise<number> => {
+  const goerli = await db.collection('chains')
+    .doc('goerli')
+    .get();
+  return goerli.data().blockNumber;
+}
+
+const scheduleMatch = async (database: any, firstFighter: any, secondFighter: any, block: number) => {
+  const matchesCollection = database.collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches');
+  await matchesCollection
+    .doc(`${firstFighter.id}-${secondFighter.id}`)
+    .set({
+      id: `${firstFighter.id}-${secondFighter.id}`,
+      collection1: firstFighter.collection,
+      collection2: secondFighter.collection,
+      fighter1: firstFighter.id,
+      fighter2: secondFighter.id,
+      owner1: firstFighter.owner,
+      owner2: secondFighter.owner,
+      player1: firstFighter.player,
+      player2: secondFighter.player,
+      block: String(block),
+      randomness: '', // This will be back filled when the fight is simulated with the randomness
+      log: '', // This will be back filled
+    });
+};
