@@ -2,6 +2,7 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
+import { getPerFighterMatchStats } from "../src/matches/matches";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -113,10 +114,73 @@ const simulateFightFxn = async () => {
   }
   console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
 }
-simulateFightFxn()
-registerFighterFxn()
-registerAnotherFighterFxn()
 
+const simulateMatchStatsPlayer2Fucked = () => {
+  // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
+  const f1 = {
+    attack: 9,
+    defense: 14,
+    element: 0,
+    health: 15,
+    id: "31035683",
+    power: 57,
+    special_attack: 15,
+    special_element: 4,
+  }
+
+  const f2 = {
+    attack: 4,
+    defense: 5,
+    element: 1,
+    health: 7,
+    id: "179684769",
+    power: 25,
+    special_attack: 7,
+    special_element: 1,
+  };
+
+  const result = getPerFighterMatchStats(
+    "11000100110111100000010000001001101000010100000",
+    f1,
+    f2);
+  console.log(`simulateMatchStatsPlayer2Fucked results: ${JSON.stringify(result)}`);
+};
+simulateMatchStatsPlayer2Fucked();
+
+const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
+  // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
+  const f1 = {
+    attack: 6,
+    defense: 10,
+    element: 6,
+    health: 10,
+    id: "44344314",
+    power: 53,
+    special_attack: 11,
+    special_element: 10,
+  }
+
+  const f2 = {
+    attack: 14,
+    defense: 15,
+    element: 3,
+    health: 15,
+    id: "44341766",
+    power: 74,
+    special_attack: 15,
+    special_element: 12,
+  };
+
+  const result = getPerFighterMatchStats(
+    "10011100001101000000011000001000000100101000001100001000101000001110011000010000001010101001",
+    f1,
+    f2);
+  console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}`);
+};
+simulateMatchStatsTieDyeOnTieDyeViolence();
+// simulateFightFxn();
+// registerFighterFxn();
+// registerAnotherFighterFxn();
 
 // Randomness Example
 // let userRandomness = await fightClub.getUserRandomness(signer);

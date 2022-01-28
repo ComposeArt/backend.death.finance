@@ -44,6 +44,10 @@ export const updateMatch = async (change: any, context: any, admin: any) => {
     if (!oldMatch.updateImage && match.updateImage) {
       await updateMatchImage(db, storage, match);
     }
+
+    if (match.hasOwnProperty('updateStats') && match.updateStats) {
+      await updateMatchStats(db, match);
+    }
   } catch (error) {
     console.error(error);
   }
