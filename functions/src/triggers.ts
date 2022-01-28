@@ -17,7 +17,7 @@ export const createMatch = async (admin: any, snap: any, context: any) => {
 
 export const createFighter = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
-  const fighter = snap.after.data() || {};
+  const fighter = snap.data() || {};
 
   registrationFunctions.schedulePreSeasonMatches(admin, snap);
 
