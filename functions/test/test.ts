@@ -15,24 +15,25 @@ connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateFight = httpsCallable(functions, 'simulateFight');
 const registerFighter = httpsCallable(functions, 'registerFighter');
 
-const getFightSimulationResultsFxn = async () => {
-  const result = await getFightSimulationResults({
-    f1: {
-      collection: 'minitaurs-reborn',
-      id: '182521675',
-      binary_power: 16498618
-    },
-    f2: {
-      collection: 'galaktic-gang',
-      id: '150340670',
-      binary_power: 16498619
-    },
-    blockNumber: 6276992
-  }).catch((error) => {
-    console.log("simulateFightResults received error %s", getErrorMessage(error));
-  });
-  console.log("simulateFightResults %s", result);
-};
+// TODO: Fix reference to admin/db for tests https://github.com/ComposeArt/backend/issues/12
+// const getFightSimulationResultsFxn = async () => {
+//   const result = await getFightSimulationResults({
+//     f1: {
+//       collection: 'minitaurs-reborn',
+//       id: '182521675',
+//       binary_power: 16498618
+//     },
+//     f2: {
+//       collection: 'galaktic-gang',
+//       id: '150340670',
+//       binary_power: 16498619
+//     },
+//     blockNumber: 6276992
+//   }).catch((error) => {
+//     console.log("simulateFightResults received error %s", getErrorMessage(error));
+//   });
+//   console.log("simulateFightResults %s", result);
+// };
 
 const registerFighterFxn = async () => {
   const result = await registerFighter({

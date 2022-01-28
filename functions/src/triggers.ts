@@ -352,16 +352,17 @@ export const updateBlock = async (change: any, admin: any) => {
   const db = admin.firestore();
 
   const newBlockNumber = change.after.data().blockNumber;
-  console.log("newBlockNumber received %s", newBlockNumber);
+  console.log('newBlockNumber received %s', newBlockNumber);
   const matchesForBlock = await simulateFunctions.getMatchesForBlock(db, newBlockNumber);
   const fightResults = await Promise.all(matchesForBlock.docs.map(async (match: any) => {
     return await simulateFunctions.getFightSimulationResults({
+      db,
       f1: match.player1,
       f2: match.player2,
       blockNumber: newBlockNumber,
-    })
+    });
   }));
-  console.log("fightResults for block %s: %s", newBlockNumber, fightResults);
+  console.log('fightResults for block %s: %s', newBlockNumber, fightResults);
 
   fightResults.forEach((fightResult) => {
     try {
