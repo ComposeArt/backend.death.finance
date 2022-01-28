@@ -118,7 +118,7 @@ const updateProfileImage = async (db: any, storage: any, fighter: any) => {
             </body>
             </html>
         `
-        });
+      });
     } else {
       if (players.length === 2) {
         players = players.concat([players[1], players[0]]);

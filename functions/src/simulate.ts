@@ -8,47 +8,47 @@ import nodeHtmlToImage from 'node-html-to-image';
 import FightClub from './FightClub.json';
 
 const getFightClubContract = async (db: any) => {
-    const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
-    const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
-    const signer = wallet.connect(infuraProvider);
+  const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
+  const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
+  const signer = wallet.connect(infuraProvider);
 
-    try {
-      const goerli = await db.collection('chains')
+  try {
+    const goerli = await db.collection('chains')
       .doc('goerli')
       .get();
 
-      const address = goerli.contractAddress;
-      const fightClub = new ethers.Contract(
-        address,
-        FightClub.abi,
-        signer
-      );
-      return fightClub;
-    } catch (error) {
-      throw new Error(`could not find contract address for chain`);
-    }
+    const address = goerli.contractAddress;
+    const fightClub = new ethers.Contract(
+      address,
+      FightClub.abi,
+      signer
+    );
+    return fightClub;
+  } catch (error) {
+    throw new Error(`could not find contract address for chain`);
+  }
 };
 
 export const getMatchesForBlock = async (db: any, blockNumber: number) => {
   try {
-  const matches = await db
-    .collection('nft-death-games')
-    .doc('season_0')
-    .collection('matches')
-    .where('block', '==', blockNumber)
-    .get();
+    const matches = await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .collection('matches')
+      .where('block', '==', blockNumber)
+      .get();
 
-  if (!matches.exists) {
+    if (!matches.exists) {
       throw new Error(`no matches for block ${blockNumber}`);
     }
 
-  return matches;
+    return matches;
   } catch (error) {
     console.log(`getMatchesForBlock error getErrorMessage(error`);
   }
 };
 
-export const getFightSimulationResults = async ({db, f1, f2, blockNumber }: any) => {
+export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
   const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 0) });
   const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
@@ -60,14 +60,14 @@ export const getFightSimulationResults = async ({db, f1, f2, blockNumber }: any)
 
 export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: any, randomness: string) => {
   await db
-  .collection('nft-death-games')
-  .doc('season_0')
-  .collection('matches')
-  .doc(matchId)
-  .update({
-    log: fightLog,
-    randomness,
-  });
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .doc(matchId)
+    .update({
+      log: fightLog,
+      randomness,
+    });
 };
 
 export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any, context?: any) => {
