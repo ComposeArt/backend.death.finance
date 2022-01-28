@@ -1,12 +1,34 @@
 require('dotenv').config();
 
-import _ from 'lodash';
+import _, { random } from 'lodash';
 import moment from 'moment';
 import { ethers } from 'ethers';
 import * as functions from 'firebase-functions';
 import nodeHtmlToImage from 'node-html-to-image';
 
 import FightClub from './FightClub.json';
+const getFightClubContract = async () => {
+    const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
+    const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
+    const signer = wallet.connect(infuraProvider);
+
+    const fightClub = new ethers.Contract(
+      '0xEA896aA63f6495f50a26c49749306b28B07E79e0',
+      FightClub.abi,
+      signer
+    );
+    return fightClub
+};
+
+export const getFightSimulationResults = async ({ f1, f2, blockNumber }: any) => {
+  const fightClub = await getFightClubContract();
+  const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber) });
+  let eventLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+  return {
+    eventLog,
+    randomness: randomness.toString(),
+  };
+};
 
 export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any, context?: any) => {
   try {
