@@ -5,8 +5,70 @@ import moment from 'moment';
 import { ethers } from 'ethers';
 import * as functions from 'firebase-functions';
 import nodeHtmlToImage from 'node-html-to-image';
-
 import FightClub from './FightClub.json';
+
+const getFightClubContract = async (db: any) => {
+  const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
+  const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
+  const signer = wallet.connect(infuraProvider);
+
+  try {
+    const goerli = await db.collection('chains')
+      .doc('goerli')
+      .get();
+
+    const address = goerli.contractAddress;
+    const fightClub = new ethers.Contract(
+      address,
+      FightClub.abi,
+      signer
+    );
+    return fightClub;
+  } catch (error) {
+    throw new Error(`could not find contract address for chain`);
+  }
+};
+
+export const getMatchesForBlock = async (db: any, blockNumber: number) => {
+  try {
+    const matches = await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .collection('matches')
+      .where('block', '==', blockNumber)
+      .get();
+
+    if (!matches.exists) {
+      throw new Error(`no matches for block ${blockNumber}`);
+    }
+
+    return matches;
+  } catch (error) {
+    throw new Error(`getMatchesForBlock error ${getErrorMessage(error)}`);
+  }
+};
+
+export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
+  const fightClub = await getFightClubContract(db);
+  const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 0) });
+  const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+  return {
+    fightLog,
+    randomness: randomness.toString(),
+  };
+};
+
+export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: any, randomness: string) => {
+  await db
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .doc(matchId)
+    .update({
+      log: fightLog,
+      randomness,
+    });
+};
 
 export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any, context?: any) => {
   try {
@@ -38,7 +100,7 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
       const signer = wallet.connect(infuraProvider);
 
       const fightClub = new ethers.Contract(
-        '0xEA896aA63f6495f50a26c49749306b28B07E79e0',
+        '0xc16e8A86E3834E04AfFADC3bFDFD3FA502190c1B',
         FightClub.abi,
         signer
       );

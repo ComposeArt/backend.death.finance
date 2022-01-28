@@ -14,7 +14,7 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
     });
 
     const openSeaData = await openSeaResult.json();
-    if (openSeaData.success == false) {
+    if (openSeaData.success === false) {
       throw new Error(`Request to OpenSea failed`);
     }
 
@@ -161,7 +161,7 @@ export const schedulePreSeasonMatches = async (
   const db = admin.firestore();
 
   const newFighter = snapshot.data();
-  console.log("Scheduling pre-season fights for fighter %s", newFighter);
+  console.log('Scheduling pre-season fights for fighter %s', newFighter);
 
   const allFighterSnapshot = await db.collection('nft-death-games')
     .doc('season_0')
@@ -171,7 +171,7 @@ export const schedulePreSeasonMatches = async (
     .where('id', '!=', newFighter.id)
     .get();
 
-  var currentBlock = await getCurrentBlockNumber(db);
+  let currentBlock = await getCurrentBlockNumber(db);
 
   const allFighters = allFighterSnapshot.docs.map((fighter: any) => fighter.data());
   // TODO: Parallelize these writes https://github.com/ComposeArt/backend/issues/8
@@ -208,7 +208,7 @@ const getCurrentBlockNumber = async (db: any): Promise<number> => {
     .doc('goerli')
     .get();
   return goerli.data().blockNumber;
-}
+};
 
 const scheduleMatch = async (database: any, firstFighter: any, secondFighter: any, block: number) => {
   const matchesCollection = database.collection('nft-death-games')
