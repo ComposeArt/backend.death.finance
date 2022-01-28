@@ -44,7 +44,7 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
 
     return matches;
   } catch (error) {
-    console.log(`getMatchesForBlock error getErrorMessage(error`);
+    throw new Error(`getMatchesForBlock error ${getErrorMessage(error)}`);
   }
 };
 

@@ -364,9 +364,9 @@ export const updateBlock = async (change: any, admin: any) => {
   }));
   console.log('fightResults for block %s: %s', newBlockNumber, fightResults);
 
-  fightResults.forEach((fightResult) => {
+  await Promise.all(fightResults.map(async (fightResult) => {
     try {
-      const saveResult = simulateFunctions.saveFightResultsToMatch(
+      const saveResult = await simulateFunctions.saveFightResultsToMatch(
         db,
         fightResult.id,
         fightResult.fightLog,
@@ -375,7 +375,7 @@ export const updateBlock = async (change: any, admin: any) => {
     } catch (error) {
       console.log(`saveFightResultsToMatch error: ${getErrorMessage(error)}`);
     }
-  });
+  }));
 };
 
 const getErrorMessage = (error: unknown) => {
