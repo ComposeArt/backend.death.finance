@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import nodeHtmlToImage from 'node-html-to-image';
 import * as registrationFunctions from './registration';
+import * as simulateFunctions from './simulate';
 
 export const createMatch = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -15,7 +16,7 @@ export const createMatch = async (admin: any, snap: any, context: any) => {
   }
 };
 
-export const createFighter = async (admin: any, snap: any, context: any) => {
+export const createFighter = async (admin: any, snap: any) => {
   const db = admin.firestore();
   const fighter = snap.data() || {};
 
@@ -345,4 +346,43 @@ export const updateFighterImage = async (db: any, storage: any, fighter: any) =>
   } catch (error) {
     console.error(error);
   }
+};
+
+export const updateBlock = async (change: any, admin: any) => {
+  const db = admin.firestore();
+
+  const newBlockNumber = change.after.data().blockNumber;
+  console.log("newBlockNumber received %s", newBlockNumber);
+  const matchesForBlock = await simulateFunctions.getMatchesForBlock(db, newBlockNumber);
+  const fightResults = await Promise.all(matchesForBlock.docs.map(async (match: any) => {
+    return await simulateFunctions.getFightSimulationResults({
+      f1: match.player1,
+      f2: match.player2,
+      blockNumber: newBlockNumber,
+    })
+  }));
+  console.log("fightResults for block %s: %s", newBlockNumber, fightResults);
+
+  fightResults.forEach((fightResult) => {
+    try {
+      const saveResult = simulateFunctions.saveFightResultsToMatch(
+        db,
+        fightResult.id,
+        fightResult.fightLog,
+        fightResult.randomness);
+      console.log(`saveFightResultsToMatch ${fightResult.id} result: ${saveResult}`);
+    } catch (error) {
+      console.log(`saveFightResultsToMatch error: ${getErrorMessage(error)}`);
+    }
+  });
+};
+
+const getErrorMessage = (error: unknown) => {
+  console.log(error);
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return '';
 };
