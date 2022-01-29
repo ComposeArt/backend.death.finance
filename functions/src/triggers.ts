@@ -2,6 +2,7 @@ import _ from 'lodash';
 import nodeHtmlToImage from 'node-html-to-image';
 import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
+import * as matchesFunctions from './matches/matches';
 
 export const createMatch = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -46,7 +47,7 @@ export const updateMatch = async (change: any, context: any, admin: any) => {
     }
 
     if (match.hasOwnProperty('updateStats') && match.updateStats) {
-      await updateMatchStats(db, match);
+      await matchesFunctions.updateFighterStatsForMatch(db, match);
     }
   } catch (error) {
     console.error(error);

@@ -115,7 +115,7 @@ const simulateFightFxn = async () => {
   console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
 }
 
-const simulateMatchStatsPlayer2Fucked = () => {
+const simulateMatchStatsFighter2Fucked = () => {
   // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
   const f1 = {
     attack: 9,
@@ -145,7 +145,6 @@ const simulateMatchStatsPlayer2Fucked = () => {
     f2);
   console.log(`simulateMatchStatsPlayer2Fucked results: ${JSON.stringify(result)}`);
 };
-simulateMatchStatsPlayer2Fucked();
 
 const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
@@ -177,10 +176,12 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
     f2);
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}`);
 };
+
+simulateMatchStatsFighter2Fucked();
 simulateMatchStatsTieDyeOnTieDyeViolence();
-// simulateFightFxn();
-// registerFighterFxn();
-// registerAnotherFighterFxn();
+simulateFightFxn();
+registerFighterFxn();
+registerAnotherFighterFxn();
 
 // Randomness Example
 // let userRandomness = await fightClub.getUserRandomness(signer);

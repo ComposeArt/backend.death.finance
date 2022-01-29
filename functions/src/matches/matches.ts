@@ -1,13 +1,6 @@
 import _ from 'lodash';
 import { elementStrengths } from './matchesUtils';
 
-export const updateMatchStats = ({
-  db,
-  match
-}: any) => {
-  // Coming in next commit
-};
-
 interface IFighterMatchStats {
   fighterId: string;
   won: boolean;
@@ -25,11 +18,27 @@ interface IFighterMatchStats {
   damageReceived: number;
 }
 
+export const updateFighterStatsForMatch = async (
+  db: any,
+  match: any
+) => {
+  const results = getPerFighterMatchStats(match.log, match.player1, match.player2);
+  await db
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .doc(match.id)
+    .set({
+      results,
+      updateStats: false,
+    });
+};
+
 export const getPerFighterMatchStats = (
   fightLog: any,
   fighter1: any,
   fighter2: any,
-): {p1: IFighterMatchStats, p2: IFighterMatchStats} => {
+): { fighter1Stats: IFighterMatchStats, fighter2Stats: IFighterMatchStats } => {
   const bouts = fightLog.slice(1, -1).match(/.{1,9}/g);
   const winner = fightLog.slice(-1);
 
@@ -296,7 +305,7 @@ export const getPerFighterMatchStats = (
   };
 
   return {
-    p1: p1MatchStats,
-    p2: p2MatchStats
+    fighter1Stats: p1MatchStats,
+    fighter2Stats: p2MatchStats
   };
 };
