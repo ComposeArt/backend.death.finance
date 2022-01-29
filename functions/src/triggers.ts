@@ -46,7 +46,7 @@ export const updateMatch = async (change: any, context: any, admin: any) => {
       await updateMatchImage(db, storage, match);
     }
 
-    if (match.hasOwnProperty('updateStats') && match.updateStats) {
+    if (!oldMatch.updateStats && match.updateStats) {
       await matchesFunctions.updateFighterStatsForMatch(db, match);
     }
   } catch (error) {
