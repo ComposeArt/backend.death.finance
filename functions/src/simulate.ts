@@ -67,6 +67,7 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
     .update({
       log: fightLog,
       randomness,
+      updateStats: true,
     });
 };
 
