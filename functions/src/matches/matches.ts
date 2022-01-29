@@ -29,7 +29,8 @@ export const updateFighterStatsForMatch = async (
     .collection('matches')
     .doc(match.id)
     .set({
-      results,
+      stats1: results.stats1,
+      stats2: results.stats2,
       updateStats: false,
     });
 };
@@ -38,7 +39,7 @@ export const getPerFighterMatchStats = (
   fightLog: any,
   fighter1: any,
   fighter2: any,
-): { fighter1Stats: IFighterMatchStats, fighter2Stats: IFighterMatchStats } => {
+): { stats1: IFighterMatchStats, stats2: IFighterMatchStats } => {
   const bouts = fightLog.slice(1, -1).match(/.{1,9}/g);
   const winner = fightLog.slice(-1);
 
@@ -305,7 +306,7 @@ export const getPerFighterMatchStats = (
   };
 
   return {
-    fighter1Stats: p1MatchStats,
-    fighter2Stats: p2MatchStats
+    stats1: p1MatchStats,
+    stats2: p2MatchStats
   };
 };
