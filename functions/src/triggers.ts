@@ -73,6 +73,10 @@ export const updateFighter = async (change: any, context: any, admin: any) => {
     if (!oldFighter.updateCollection && fighter.updateCollection) {
       await updateCollectionImage(db, storage, fighter);
     }
+
+    if (!oldFighter.updateStats && fighter.updateStats) {
+      await updateFighterStats(db, fighter);
+    }
   } catch (error) {
     console.error(error);
   }
@@ -350,6 +354,39 @@ export const updateFighterImage = async (db: any, storage: any, fighter: any) =>
     });
   } catch (error) {
     console.error(error);
+  }
+};
+
+export const updateFighterStats = async (db: any, fighter: any) => {
+  const matchPath = db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .where('statsDone', '==', true);
+  try {
+    const fighter1Matches = await matchPath
+      .where('fighter1', '==', fighter.id)
+      .get();
+
+    const fighter2Matches = await matchPath
+      .where('fighter2', '==', fighter.id)
+      .get();
+
+    const stats = matchesFunctions
+      .totalStatsForMatches(fighter.id, fighter1Matches.concat(fighter2Matches));
+
+    await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .collection('fighters')
+      .doc(fighter.id)
+      .update({
+        stats: stats,
+        updateStats: false,
+      });
+
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Failed updating stats for fighter ${fighter.id}`);
   }
 };
 
