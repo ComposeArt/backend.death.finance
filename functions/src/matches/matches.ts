@@ -18,6 +18,46 @@ interface IFighterMatchStats {
   damageReceived: number;
 }
 
+// These two interfaces are very similar, just changing `boolean` types to `number` for properties like knockedOutOpponent.
+interface ICumulativeFighterStats {
+  fighterId: string;
+  won: number;
+  knockedOutOpponent: number;
+  perfectedOpponent: number;
+  uninjured: number;
+  untouched: number;
+  pattyCaked: number;
+  boutsFought: number;
+  dodges: number;
+  criticals: number;
+  counterAttacks: number;
+  misses: number;
+  damageDealt: number;
+  damageReceived: number;
+}
+
+export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeFighterStats => {
+  const allMatchStats = matches.map((match) => (match.fighter1 === fighterId) ? match.stats1 : match.stats2);
+  return allMatchStats.reduce((cumulativeStats, currentMatch) => {
+    return {
+      fighterId,
+      wins: cumulativeStats.won + currentMatch.won,
+      knockouts: cumulativeStats.knockedOutOpponent + currentMatch.knockedOutOpponent,
+      perfects: cumulativeStats.perfectedOpponent + currentMatch.perfectedOpponent,
+      fightsUninjured: cumulativeStats.uninjured + currentMatch.uninjured,
+      fightsUntouched: cumulativeStats.untouched + currentMatch.untouched,
+      pattyCakeFights: cumulativeStats.pattyCaked + currentMatch.pattyCaked,
+      boutsFought: cumulativeStats.boutsFought + currentMatch.boutsFought,
+      dodges: cumulativeStats.dodges + currentMatch.dodges,
+      criticals: cumulativeStats.criticals + currentMatch.criticals,
+      counterAttacks: cumulativeStats.counterAttacks + currentMatch.counterAttacks,
+      misses: cumulativeStats.misses + currentMatch.misses,
+      damageDealt: cumulativeStats.damageDealt + currentMatch.damageDealt,
+      damageReceived: cumulativeStats.damageReceived + currentMatch.damageReceived,
+    };
+  });
+};
+
 export const updateFighterStatsForMatch = async (
   db: any,
   match: any
@@ -32,6 +72,7 @@ export const updateFighterStatsForMatch = async (
       stats1: results.stats1,
       stats2: results.stats2,
       updateStats: false,
+      statsDone: true,
     });
 };
 

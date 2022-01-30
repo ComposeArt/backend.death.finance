@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats } from "../src/matches/matches";
+import { getPerFighterMatchStats, totalStatsForMatches } from "../src/matches/matches";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -177,6 +177,53 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}`);
 };
 
+const totalStats = () => {
+  const id = "139776475";
+  const match1 = {
+    fighter1: id,
+    stats1: {
+      fighterId: id,
+      won: true,
+      knockedOutOpponent: false,
+      perfectedOpponent: false,
+      uninjured: false,
+      untouched: false,
+      pattyCaked: false,
+      boutsFought: 10,
+      dodges: 1,
+      criticals: 2,
+      counterAttacks: 0,
+      misses: 2,
+      damageDealt: 19,
+      damageReceived: 25,
+    }
+  };
+
+  const match2 = {
+    fighter1: id,
+    stats1: {
+      fighterId: id,
+      won: true,
+      knockedOutOpponent: true,
+      perfectedOpponent: false,
+      uninjured: false,
+      untouched: false,
+      pattyCaked: false,
+      boutsFought: 7,
+      dodges: 0,
+      criticals: 1,
+      counterAttacks: 2,
+      misses: 0,
+      damageDealt: 29,
+      damageReceived: 14,
+    }
+  };
+
+  const result = totalStatsForMatches(id, [match1, match2]);
+  console.log(`totalStats results: ${JSON.stringify(result)}`);
+};
+
+totalStats();
 simulateMatchStatsFighter2Fucked();
 simulateMatchStatsTieDyeOnTieDyeViolence();
 simulateFightFxn();
