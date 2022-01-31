@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { ICumulativeCollectionStats, ICumulativeFighterStats } from './matches/matches';
+import { ICumulativeStats } from './matches/matches';
 
 export const updateCumulativeCollectionStats = async (collection: any, db: any) => {
   const seasonPath = db
@@ -12,7 +12,7 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
       .where('statsDone', '==', true)
       .get();
 
-    const collectionStats: ICumulativeCollectionStats = fighters
+    const collectionStats: ICumulativeStats = fighters
       .map((fighter: any) => fighter.stats)
       .reduce(addCumulativeStats);
 
@@ -31,9 +31,9 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
 };
 
 export const addCumulativeStats = (
-  cumulativeStats: ICumulativeFighterStats,
-  currentFighterStats: ICumulativeFighterStats
-): ICumulativeCollectionStats => {
+  cumulativeStats: ICumulativeStats,
+  currentFighterStats: ICumulativeStats
+): ICumulativeStats => {
   return {
     won: cumulativeStats.won + currentFighterStats.won,
     knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentFighterStats.knockedOutOpponent,

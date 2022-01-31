@@ -19,7 +19,7 @@ interface IFighterMatchStats {
 }
 
 // These two interfaces are very similar, just changing `boolean` types to `number` for properties like knockedOutOpponent.
-export interface ICumulativeFighterStats {
+export interface ICumulativeStats {
   won: number;
   knockedOutOpponent: number;
   perfectedOpponent: number;
@@ -34,9 +34,8 @@ export interface ICumulativeFighterStats {
   damageDealt: number;
   damageReceived: number;
 }
-export type ICumulativeCollectionStats = ICumulativeFighterStats;
 
-export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeFighterStats => {
+export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeStats => {
   const allMatchStats = matches.map((match) => (match.fighter1 === fighterId) ? match.stats1 : match.stats2);
   return allMatchStats.reduce((cumulativeStats, currentMatchStats) => {
     return {

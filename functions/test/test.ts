@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, ICumulativeFighterStats, totalStatsForMatches } from "../src/matches/matches";
+import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 
 const app = initializeApp({
@@ -225,7 +225,7 @@ const totalFighterStats = () => {
 };
 
 const totalCollectionStats = () => {
-  const fighter1Stats : ICumulativeFighterStats= {
+  const fighter1Stats: ICumulativeStats = {
       won: 7,
       knockedOutOpponent: 1,
       perfectedOpponent: 3,
@@ -241,7 +241,7 @@ const totalCollectionStats = () => {
       damageReceived: 25,
   };
 
-  const fighter2Stats: ICumulativeFighterStats = {
+  const fighter2Stats: ICumulativeStats = {
       won: 2,
       knockedOutOpponent: 11,
       perfectedOpponent: 3,
