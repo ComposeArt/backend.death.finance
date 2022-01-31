@@ -34,6 +34,7 @@ export interface ICumulativeFighterStats {
   damageDealt: number;
   damageReceived: number;
 }
+export type ICumulativeCollectionStats = ICumulativeFighterStats;
 
 export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeFighterStats => {
   const allMatchStats = matches.map((match) => (match.fighter1 === fighterId) ? match.stats1 : match.stats2);

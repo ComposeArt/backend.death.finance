@@ -42,6 +42,9 @@ export const onUpdateBlock = firebaseFunction.firestore
   .document('chains/goerli')
   .onUpdate(async (change, context) => await triggerFunctions.updateBlock(change, admin));
 
+export const onUpdateCollection = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/collections/{collectionId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateCollection(change, admin.firestore()));
 // ------------------ //
 //      CALLABLE      //
 // ------------------ //
