@@ -4,6 +4,7 @@ import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
 import * as matchesFunctions from './matches/matches';
 import * as collectionFunctions from './collection';
+import * as seasonFunctions from './season';
 
 export const createMatch = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -428,6 +429,18 @@ export const updateCollection = async (change: any, db: any) => {
   try {
     if (!previous.updateStats && updatedCollection.updateStats) {
       await collectionFunctions.updateCumulativeCollectionStats(updatedCollection, db);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateSeason = async (change: any, db: any) => {
+  const previous = change.before.data();
+  const updatedSeason = change.after.data();
+  try {
+    if (!previous.updateStats && updatedSeason.updateStats) {
+      await seasonFunctions.updateCumulativeSeasonStats(updatedSeason, db);
     }
   } catch (error) {
     console.error(error);

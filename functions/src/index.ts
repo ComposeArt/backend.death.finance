@@ -45,6 +45,11 @@ export const onUpdateBlock = firebaseFunction.firestore
 export const onUpdateCollection = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/collections/{collectionId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateCollection(change, admin.firestore()));
+
+export const onUpdateSeason = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateSeason(change, admin.firestore()));
+
 // ------------------ //
 //      CALLABLE      //
 // ------------------ //
