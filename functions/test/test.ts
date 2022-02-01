@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
+import { getFightSimulationResults } from "../src/simulate";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -18,24 +19,24 @@ const simulateFight = httpsCallable(functions, 'simulateFight');
 const registerFighter = httpsCallable(functions, 'registerFighter');
 
 // TODO: Fix reference to admin/db for tests https://github.com/ComposeArt/backend/issues/12
-// const getFightSimulationResultsFxn = async () => {
-//   const result = await getFightSimulationResults({
-//     f1: {
-//       collection: 'minitaurs-reborn',
-//       id: '182521675',
-//       binary_power: 16498618
-//     },
-//     f2: {
-//       collection: 'galaktic-gang',
-//       id: '150340670',
-//       binary_power: 16498619
-//     },
-//     blockNumber: 6276992
-//   }).catch((error) => {
-//     console.log("simulateFightResults received error %s", getErrorMessage(error));
-//   });
-//   console.log("simulateFightResults %s", result);
-// };
+const getFightSimulationResultsFxn = async () => {
+  const result = await getFightSimulationResults({
+    f1: {
+      collection: 'minitaurs-reborn',
+      id: '182521675',
+      binary_power: 16498618
+    },
+    f2: {
+      collection: 'galaktic-gang',
+      id: '150340670',
+      binary_power: 16498619
+    },
+    blockNumber: 6276992
+  }).catch((error) => {
+    console.log("simulateFightResults received error %s", getErrorMessage(error));
+  });
+  console.log("simulateFightResults %s", result);
+};
 
 const registerFighterFxn = async () => {
   const result = await registerFighter({
@@ -261,13 +262,14 @@ const totalCollectionStats = () => {
   console.log(`totalCollectionStats results: ${JSON.stringify(result)}`);
 };
 
-registerFighterFxn();
-registerAnotherFighterFxn();
-simulateFightFxn();
-simulateMatchStatsFighter2Fucked();
-simulateMatchStatsTieDyeOnTieDyeViolence();
-totalFighterStats();
-totalCollectionStats();
+getFightSimulationResultsFxn();
+// registerFighterFxn();
+// registerAnotherFighterFxn();
+// simulateFightFxn();
+// simulateMatchStatsFighter2Fucked();
+// simulateMatchStatsTieDyeOnTieDyeViolence();
+// totalFighterStats();
+// totalCollectionStats();
 
 // Randomness Example
 // let userRandomness = await fightClub.getUserRandomness(signer);
