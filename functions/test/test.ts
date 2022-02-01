@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
+import { compareFighters } from "../src/season";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -226,39 +227,104 @@ const totalFighterStats = () => {
 
 const totalCollectionStats = () => {
   const fighter1Stats: ICumulativeStats = {
-      won: 7,
-      knockedOutOpponent: 1,
-      perfectedOpponent: 3,
-      uninjured: 0,
-      untouched: 9,
-      pattyCaked: 1,
-      boutsFought: 10,
-      dodges: 1,
-      criticals: 2,
-      counterAttacks: 0,
-      misses: 2,
-      damageDealt: 19,
-      damageReceived: 25,
+    won: 7,
+    knockedOutOpponent: 1,
+    perfectedOpponent: 3,
+    uninjured: 0,
+    untouched: 9,
+    pattyCaked: 1,
+    boutsFought: 10,
+    dodges: 1,
+    criticals: 2,
+    counterAttacks: 0,
+    misses: 2,
+    damageDealt: 19,
+    damageReceived: 25,
   };
 
   const fighter2Stats: ICumulativeStats = {
-      won: 2,
-      knockedOutOpponent: 11,
-      perfectedOpponent: 3,
-      uninjured: 1,
-      untouched: 2,
-      pattyCaked: 3,
-      boutsFought: 7,
-      dodges: 0,
-      criticals: 1,
-      counterAttacks: 2,
-      misses: 0,
-      damageDealt: 29,
-      damageReceived: 14,
+    won: 2,
+    knockedOutOpponent: 11,
+    perfectedOpponent: 3,
+    uninjured: 1,
+    untouched: 2,
+    pattyCaked: 3,
+    boutsFought: 7,
+    dodges: 0,
+    criticals: 1,
+    counterAttacks: 2,
+    misses: 0,
+    damageDealt: 29,
+    damageReceived: 14,
   };
 
   const result = addCumulativeStats(fighter1Stats, fighter2Stats);
   console.log(`totalCollectionStats results: ${JSON.stringify(result)}`);
+};
+
+const rankFighters = () => {
+  const fighter1 = {
+    id: 1,
+    stats: {
+      won: 3,
+      knockedOutOpponent: 0,
+      perfectedOpponent: 1,
+      damageDealt: 19,
+      damageReceived: 25,
+    },
+    player: {
+      power: 81
+    }
+  };
+
+  const fighter2 = {
+    id: 2,
+    stats: {
+      won: 5,
+      knockedOutOpponent: 0,
+      perfectedOpponent: 1,
+      damageDealt: 19,
+      damageReceived: 25,
+    },
+    player: {
+      power: 69
+    }
+  };
+
+  const fighter3 = {
+    id: 3,
+    stats: {
+      won: 5,
+      knockedOutOpponent: 0,
+      perfectedOpponent: 1,
+      damageDealt: 20,
+      damageReceived: 25,
+    },
+    player: {
+      power: 68
+    }
+  };
+
+  const fighter4 = {
+    id: 4,
+    stats: {
+      won: 5,
+      knockedOutOpponent: 0,
+      perfectedOpponent: 1,
+      damageDealt: 20,
+      damageReceived: 25,
+    },
+    player: {
+      power: 69
+    }
+  };
+
+  const fighters = [fighter1, fighter2, fighter3, fighter4];
+  const sorted = fighters.sort(compareFighters);
+  const ids = sorted.map((fighter) => fighter.id);
+
+  // Order should be fighter3, fighter4, fighter2, fighter1
+  console.log(`rankFighters order is now: ${ids}`);
 };
 
 registerFighterFxn();
@@ -268,6 +334,7 @@ simulateMatchStatsFighter2Fucked();
 simulateMatchStatsTieDyeOnTieDyeViolence();
 totalFighterStats();
 totalCollectionStats();
+rankFighters();
 
 // Randomness Example
 // let userRandomness = await fightClub.getUserRandomness(signer);
