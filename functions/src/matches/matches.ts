@@ -19,8 +19,7 @@ interface IFighterMatchStats {
 }
 
 // These two interfaces are very similar, just changing `boolean` types to `number` for properties like knockedOutOpponent.
-interface ICumulativeFighterStats {
-  fighterId: string;
+export interface ICumulativeStats {
   won: number;
   knockedOutOpponent: number;
   perfectedOpponent: number;
@@ -36,24 +35,23 @@ interface ICumulativeFighterStats {
   damageReceived: number;
 }
 
-export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeFighterStats => {
+export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeStats => {
   const allMatchStats = matches.map((match) => (match.fighter1 === fighterId) ? match.stats1 : match.stats2);
-  return allMatchStats.reduce((cumulativeStats, currentMatch) => {
+  return allMatchStats.reduce((cumulativeStats, currentMatchStats) => {
     return {
-      fighterId,
-      wins: cumulativeStats.won + currentMatch.won,
-      knockouts: cumulativeStats.knockedOutOpponent + currentMatch.knockedOutOpponent,
-      perfects: cumulativeStats.perfectedOpponent + currentMatch.perfectedOpponent,
-      fightsUninjured: cumulativeStats.uninjured + currentMatch.uninjured,
-      fightsUntouched: cumulativeStats.untouched + currentMatch.untouched,
-      pattyCakeFights: cumulativeStats.pattyCaked + currentMatch.pattyCaked,
-      boutsFought: cumulativeStats.boutsFought + currentMatch.boutsFought,
-      dodges: cumulativeStats.dodges + currentMatch.dodges,
-      criticals: cumulativeStats.criticals + currentMatch.criticals,
-      counterAttacks: cumulativeStats.counterAttacks + currentMatch.counterAttacks,
-      misses: cumulativeStats.misses + currentMatch.misses,
-      damageDealt: cumulativeStats.damageDealt + currentMatch.damageDealt,
-      damageReceived: cumulativeStats.damageReceived + currentMatch.damageReceived,
+      won: cumulativeStats.won + currentMatchStats.won,
+      knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentMatchStats.knockedOutOpponent,
+      perfectedOpponent: cumulativeStats.perfectedOpponent + currentMatchStats.perfectedOpponent,
+      uninjured: cumulativeStats.uninjured + currentMatchStats.uninjured,
+      untouched: cumulativeStats.untouched + currentMatchStats.untouched,
+      pattyCaked: cumulativeStats.pattyCaked + currentMatchStats.pattyCaked,
+      boutsFought: cumulativeStats.boutsFought + currentMatchStats.boutsFought,
+      dodges: cumulativeStats.dodges + currentMatchStats.dodges,
+      criticals: cumulativeStats.criticals + currentMatchStats.criticals,
+      counterAttacks: cumulativeStats.counterAttacks + currentMatchStats.counterAttacks,
+      misses: cumulativeStats.misses + currentMatchStats.misses,
+      damageDealt: cumulativeStats.damageDealt + currentMatchStats.damageDealt,
+      damageReceived: cumulativeStats.damageReceived + currentMatchStats.damageReceived,
     };
   });
 };

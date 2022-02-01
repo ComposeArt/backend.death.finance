@@ -2,7 +2,8 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, totalStatsForMatches } from "../src/matches/matches";
+import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
+import { addCumulativeStats } from "../src/collection";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -177,7 +178,7 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}`);
 };
 
-const totalStats = () => {
+const totalFighterStats = () => {
   const id = "139776475";
   const match1 = {
     fighter1: id,
@@ -220,15 +221,53 @@ const totalStats = () => {
   };
 
   const result = totalStatsForMatches(id, [match1, match2]);
-  console.log(`totalStats results: ${JSON.stringify(result)}`);
+  console.log(`totalFighterStats results: ${JSON.stringify(result)}`);
 };
 
-totalStats();
-simulateMatchStatsFighter2Fucked();
-simulateMatchStatsTieDyeOnTieDyeViolence();
-simulateFightFxn();
+const totalCollectionStats = () => {
+  const fighter1Stats: ICumulativeStats = {
+      won: 7,
+      knockedOutOpponent: 1,
+      perfectedOpponent: 3,
+      uninjured: 0,
+      untouched: 9,
+      pattyCaked: 1,
+      boutsFought: 10,
+      dodges: 1,
+      criticals: 2,
+      counterAttacks: 0,
+      misses: 2,
+      damageDealt: 19,
+      damageReceived: 25,
+  };
+
+  const fighter2Stats: ICumulativeStats = {
+      won: 2,
+      knockedOutOpponent: 11,
+      perfectedOpponent: 3,
+      uninjured: 1,
+      untouched: 2,
+      pattyCaked: 3,
+      boutsFought: 7,
+      dodges: 0,
+      criticals: 1,
+      counterAttacks: 2,
+      misses: 0,
+      damageDealt: 29,
+      damageReceived: 14,
+  };
+
+  const result = addCumulativeStats(fighter1Stats, fighter2Stats);
+  console.log(`totalCollectionStats results: ${JSON.stringify(result)}`);
+};
+
 registerFighterFxn();
 registerAnotherFighterFxn();
+simulateFightFxn();
+simulateMatchStatsFighter2Fucked();
+simulateMatchStatsTieDyeOnTieDyeViolence();
+totalFighterStats();
+totalCollectionStats();
 
 // Randomness Example
 // let userRandomness = await fightClub.getUserRandomness(signer);

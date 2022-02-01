@@ -3,6 +3,7 @@ import nodeHtmlToImage from 'node-html-to-image';
 import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
 import * as matchesFunctions from './matches/matches';
+import * as collectionFunctions from './collection';
 
 export const createMatch = async (admin: any, snap: any, context: any) => {
   const db = admin.firestore();
@@ -380,8 +381,9 @@ export const updateFighterStats = async (db: any, fighter: any) => {
       .collection('fighters')
       .doc(fighter.id)
       .update({
-        stats: stats,
+        stats,
         updateStats: false,
+        statsDone: true,
       });
 
   } catch (error) {
@@ -418,6 +420,18 @@ export const updateBlock = async (change: any, admin: any) => {
       console.log(`saveFightResultsToMatch error: ${getErrorMessage(error)}`);
     }
   }));
+};
+
+export const updateCollection = async (change: any, db: any) => {
+  const previous = change.before.data();
+  const updatedCollection = change.after.data();
+  try {
+    if (!previous.updateStats && updatedCollection.updateStats) {
+      await collectionFunctions.updateCumulativeCollectionStats(updatedCollection, db);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getErrorMessage = (error: unknown) => {
