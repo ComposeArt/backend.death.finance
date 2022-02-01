@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { ICumulativeStats } from './matches/matches';
 import { addCumulativeStats } from './collection';
 
-export const updateCumulativeSeasonStats = async (seasonId: any, db: any) => {
+export const updateCumulativeSeasonStats = async (seasonId: string, db: any) => {
   const seasonPath = db
     .collection('nft-death-games')
     .doc(seasonId);

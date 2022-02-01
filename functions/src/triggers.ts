@@ -440,8 +440,8 @@ export const updateSeason = async (change: any, db: any) => {
   const updatedSeason = change.after.data();
   try {
     if (!previous.updateStats && updatedSeason.updateStats) {
-      await seasonFunctions.updateCumulativeSeasonStats(updatedSeason, db);
-    }
+      await seasonFunctions.updateCumulativeSeasonStats(updatedSeason.id, db);
+    };
   } catch (error) {
     console.error(error);
   }
