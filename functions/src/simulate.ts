@@ -51,12 +51,18 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
 
 export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
-  const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 0) });
-  const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
-  return {
-    fightLog,
-    randomness: randomness.toString(),
-  };
+  try {
+    console.log(`Retrieving randomness value with blockNumber ${blockNumber}`);
+    const randomness = await fightClub.getRandomness({ blockTag: blockNumber });
+    const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+    return {
+      fightLog,
+      randomness: randomness.toString(),
+    };
+  } catch (error) {
+    console.error(`getFightSimulationResults ${error}`)
+    throw new Error(`getFightSimulationResults failed.`)
+  }
 };
 
 export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: any, randomness: string) => {
