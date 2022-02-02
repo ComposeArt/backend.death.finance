@@ -8,7 +8,7 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions --project composeart-f9a7a",
     "logs": "firebase functions:log",
-    "test": "npx ts-node test/test.ts"
+    "test": "npx ts-node test/test.ts; npx ts-node test/firestoreTest.ts"
   },
   "engines": {
     "node": "14"
