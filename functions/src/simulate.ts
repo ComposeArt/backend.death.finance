@@ -25,6 +25,7 @@ const getFightClubContract = async (db: any) => {
     );
     return fightClub;
   } catch (error) {
+    console.error(`getFightClubContract error: ${error}`);
     throw new Error(`could not find contract address for chain`);
   }
 };
