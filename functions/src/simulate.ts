@@ -17,7 +17,7 @@ const getFightClubContract = async (db: any) => {
       .doc('goerli')
       .get();
 
-    const address = goerli.contractAddress;
+    const address = goerli.data().contractAddress;
     const fightClub = new ethers.Contract(
       address,
       FightClub.abi,
@@ -25,6 +25,7 @@ const getFightClubContract = async (db: any) => {
     );
     return fightClub;
   } catch (error) {
+    console.error(`getFightClubContract error: ${error}`);
     throw new Error(`could not find contract address for chain`);
   }
 };
