@@ -409,7 +409,7 @@ export const updateBlock = async (change: any, admin: any) => {
   }));
   console.log('fightResults for block %s: %s', newBlockNumber, fightResults);
 
-  await Promise.all(fightResults.map(async (fightResult) => {
+  await Promise.all(fightResults.map(async (fightResult: any) => {
     try {
       const saveResult = await simulateFunctions.saveFightResultsToMatch(
         db,
