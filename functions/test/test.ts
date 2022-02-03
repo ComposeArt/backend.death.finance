@@ -5,6 +5,7 @@ import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
+import { fighter1, fighter2 } from "./dataSetup";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -55,46 +56,43 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const simulateFightFxn = async () => {
+  try {
+    let response: any = await simulateFight({
+      isSimulated: false,
+      fighter1,
+      fighter2,
+      random: '1',
+      blockNumber: '1'
+    });
+    response = response.data;
 
-  let response: any = await simulateFight({
-    isSimulated: false,
-    f1: {
-      collection: 'minitaurs-reborn',
-      id: '182521675',
-    },
-    f2: {
-      collection: 'galaktic-gang',
-      id: '150340670',
-    },
-    random: '1',
-    blockNumber: '1'
-  });
-  response = response.data;
+    let secondaryResponse: any = await simulateFight({
+      isSimulated: true,
+      f1: {
+        collection: 'minitaurs-reborn',
+        id: '182521675',
+      },
+      f2: {
+        collection: 'galaktic-gang',
+        id: '150340670',
+      },
+      random: response.randomness.toString(),
+      blockNumber: response.blockNumber.toString()
+    });
 
-  let secondaryResponse: any = await simulateFight({
-    isSimulated: true,
-    f1: {
-      collection: 'minitaurs-reborn',
-      id: '182521675',
-    },
-    f2: {
-      collection: 'galaktic-gang',
-      id: '150340670',
-    },
-    random: response.randomness.toString(),
-    blockNumber: response.blockNumber.toString()
-  });
+    secondaryResponse = secondaryResponse.data;
+    console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
 
-  secondaryResponse = secondaryResponse.data;
-  console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
-
-  let eventLog = response.eventLog;
-  const EVENT_SIZE = 9;
-  let isTie = (eventLog.length % EVENT_SIZE) == 1;
-  for (let i = 1; i < eventLog.length - 1; i += EVENT_SIZE) {
-    console.log(`${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P1 Attack:" : "P2 Attack:"} ${parseInt(eventLog.substring(i + 1, i + 5), 2)}, ${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P2 Counter:" : "P1 Counter:"} ${parseInt(eventLog.substring(i + 5, i + EVENT_SIZE), 2)}`);
+    let eventLog = response.eventLog;
+    const EVENT_SIZE = 9;
+    let isTie = (eventLog.length % EVENT_SIZE) == 1;
+    for (let i = 1; i < eventLog.length - 1; i += EVENT_SIZE) {
+      console.log(`${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P1 Attack:" : "P2 Attack:"} ${parseInt(eventLog.substring(i + 1, i + 5), 2)}, ${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P2 Counter:" : "P1 Counter:"} ${parseInt(eventLog.substring(i + 5, i + EVENT_SIZE), 2)}`);
+    }
+    console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
+  } catch (error) {
+    console.error(`simulateFightFxn failed: ${error}`);
   }
-  console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
 }
 
 const simulateMatchStatsFighter2Fucked = () => {
