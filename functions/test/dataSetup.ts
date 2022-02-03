@@ -22,9 +22,31 @@ const setupGoerli = async () => {
   }
 }
 
+const setupFighters = async () => {
+  console.log("setupFighters began.");
+  try {
+    await Promise.all([fighter1, fighter2].map(async (fighter) => {
+      return db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('fighters')
+        .doc(fighter.id)
+        .create({
+          id: fighter.id,
+          isDoping: false,
+          isInvalid: false,
+        });
+    }));
+    console.log(`setupFighters succeeded.`)
+  } catch (error) {
+    console.error(`setupFighters failed, error: ${error}`);
+  }
+}
+
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING DATA SETUP ---");
   await setupGoerli();
+  await setupFighters();
   console.log("--- END DATA SETUP ---\n\n");
 }
 runTestDataSetup();

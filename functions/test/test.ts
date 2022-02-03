@@ -61,8 +61,8 @@ const simulateFightFxn = async () => {
   try {
     let response: any = await simulateFight({
       isSimulated: false,
-      fighter1,
-      fighter2,
+      f1: fighter1,
+      f2: fighter2,
       random: '1',
       blockNumber: '1'
     });
@@ -70,14 +70,8 @@ const simulateFightFxn = async () => {
 
     let secondaryResponse: any = await simulateFight({
       isSimulated: true,
-      f1: {
-        collection: 'minitaurs-reborn',
-        id: '182521675',
-      },
-      f2: {
-        collection: 'galaktic-gang',
-        id: '150340670',
-      },
+      f1: fighter1,
+      f2: fighter2,
       random: response.randomness.toString(),
       blockNumber: response.blockNumber.toString()
     });
