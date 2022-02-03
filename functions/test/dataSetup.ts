@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import * as admin from 'firebase-admin';
-import {fighter1, fighter2} from "./testData";
+import * as testData from "./testData";
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
@@ -22,10 +22,33 @@ const setupGoerli = async () => {
   }
 }
 
+const setupCollections = async () => {
+  console.log("setupCollections began.");
+  try {
+    await Promise.all([testData.player1, testData.player2].map(async (player) => {
+      return db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('collections')
+        .doc(player.collection)
+        .collection('players')
+        .doc(player.id)
+        .create({
+          id: player.id,
+          isDoping: false,
+          isInvalid: false,
+        });
+    }));
+    console.log(`setupCollections succeeded.`)
+  } catch (error) {
+    console.error(`setupCollections failed, error: ${error}`);
+  }
+}
+
 const setupFighters = async () => {
   console.log("setupFighters began.");
   try {
-    await Promise.all([fighter1, fighter2].map(async (fighter) => {
+    await Promise.all([testData.fighter1, testData.fighter2].map(async (fighter) => {
       return db
         .collection('nft-death-games')
         .doc('season_0')
@@ -35,6 +58,7 @@ const setupFighters = async () => {
           id: fighter.id,
           isDoping: false,
           isInvalid: false,
+          player: fighter.player
         });
     }));
     console.log(`setupFighters succeeded.`)
@@ -46,6 +70,7 @@ const setupFighters = async () => {
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING DATA SETUP ---");
   await setupGoerli();
+  await setupCollections();
   await setupFighters();
   console.log("--- END DATA SETUP ---\n\n");
 }

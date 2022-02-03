@@ -163,10 +163,10 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
                   </div>
                   <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
                     <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
-                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter1.imageUrl}" />
+                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter1.image_url}" />
                     </div>
                     <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
-                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter2.imageUrl}" />
+                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter2.image_url}" />
                     </div>
                   </div>
                 </body>
@@ -190,7 +190,7 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
             randomness: randomness.toString(),
             timestamp: moment().format('x'),
             match: eventLog,
-            imageUrl: fileUrl,
+            image_url: fileUrl,
           });
 
         simulation = simulationDoc.id;
