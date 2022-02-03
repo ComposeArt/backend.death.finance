@@ -33,11 +33,7 @@ const setupCollections = async () => {
         .doc(player.collection)
         .collection('players')
         .doc(player.id)
-        .create({
-          id: player.id,
-          isDoping: false,
-          isInvalid: false,
-        });
+        .create({...player});
     }));
     console.log(`setupCollections succeeded.`)
   } catch (error) {
@@ -54,12 +50,7 @@ const setupFighters = async () => {
         .doc('season_0')
         .collection('fighters')
         .doc(fighter.id)
-        .create({
-          id: fighter.id,
-          isDoping: false,
-          isInvalid: false,
-          player: fighter.player
-        });
+        .create({...fighter});
     }));
     console.log(`setupFighters succeeded.`)
   } catch (error) {

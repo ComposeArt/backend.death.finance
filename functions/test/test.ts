@@ -5,7 +5,7 @@ import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
-import { fighter1, fighter2 } from "./testData";
+import * as testData from "./testData";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -61,8 +61,10 @@ const simulateFightFxn = async () => {
   try {
     let response: any = await simulateFight({
       isSimulated: false,
-      f1: fighter1,
-      f2: fighter2,
+      player1Id: testData.player1.id,
+      player1Collection: testData.player1.collection,
+      player2Id: testData.player2.id,
+      player2Collection: testData.player2.collection,
       random: '1',
       blockNumber: '1'
     });
@@ -70,8 +72,10 @@ const simulateFightFxn = async () => {
 
     let secondaryResponse: any = await simulateFight({
       isSimulated: true,
-      f1: fighter1,
-      f2: fighter2,
+      player1Id: testData.player1.id,
+      player1Collection: testData.player1.collection,
+      player2Id: testData.player2.id,
+      player2Collection: testData.player2.collection,
       random: response.randomness.toString(),
       blockNumber: response.blockNumber.toString()
     });

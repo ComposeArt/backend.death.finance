@@ -78,30 +78,39 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
     });
 };
 
-export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any) => {
+export const simulateFight = async (
+  admin: any,
+  { isSimulated,
+    player1Id,
+    player1Collection,
+    player2Id,
+    player2Collection,
+    random,
+    blockNumber
+  }: any) => {
   try {
     const db = admin.firestore();
     const storage = admin.storage();
 
-    const fighter1Doc = await db.collection('nft-death-games')
+    const player1Doc = await db.collection('nft-death-games')
       .doc('season_0')
       .collection('collections')
-      .doc(f1.collection)
+      .doc(player1Collection)
       .collection('players')
-      .doc(f1.id)
+      .doc(player1Id)
       .get();
 
-    const fighter2Doc = await db.collection('nft-death-games')
+    const player2Doc = await db.collection('nft-death-games')
       .doc('season_0')
       .collection('collections')
-      .doc(f2.collection)
+      .doc(player2Collection)
       .collection('players')
-      .doc(f2.id)
+      .doc(player2Id)
       .get();
 
-    if (fighter1Doc.exists && fighter2Doc.exists) {
-      const fighter1 = fighter1Doc.data();
-      const fighter2 = fighter2Doc.data();
+    if (player1Doc.exists && player2Doc.exists) {
+      const player1 = player1Doc.data();
+      const player2 = player2Doc.data();
 
       const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
       const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
@@ -113,7 +122,7 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
         signer
       );
 
-      let eventLog = await fightClub.fight(isSimulated, fighter1.binary_power, fighter2.binary_power, random, blockNumber);
+      let eventLog = await fightClub.fight(isSimulated, player1.binary_power, player2.binary_power, random, blockNumber);
       eventLog = BigInt((eventLog).toString().replace('.', '')).toString(2);
       const currentBlock = isSimulated ? blockNumber : (await infuraProvider.getBlock(await infuraProvider.getBlockNumber())).number;
       const randomness = isSimulated ? random : (await fightClub.getRandomness()).toString();
@@ -121,10 +130,10 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
       let simulation: any;
 
       const simulationDocs = await db.collection('nft-death-games').doc('season_0').collection('simulations')
-        .where('collection1', '==', fighter1.collection)
-        .where('player1', '==', fighter1.id)
-        .where('collection2', '==', fighter2.collection)
-        .where('player2', '==', fighter2.id)
+        .where('collection1', '==', player1.collection)
+        .where('player1', '==', player1.id)
+        .where('collection2', '==', player2.collection)
+        .where('player2', '==', player2.id)
         .where('block', '==', currentBlock.toString())
         .where('randomness', '==', randomness.toString())
         .get();
@@ -135,15 +144,15 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
 
       if (!simulation) {
         const bucket = storage.bucket();
-        const fileName = `simulations/${fighter1.collection}_${fighter1.token_id}_${fighter2.collection}_${fighter2.token_id}.png`;
+        const fileName = `simulations/${player1.collection}_${player1.token_id}_${player2.collection}_${player2.token_id}.png`;
         const file = bucket.file(fileName);
         const fileUrl = `https://storage.googleapis.com/composeart-f9a7a.appspot.com/${fileName}`;
 
         const exists = await file.exists();
 
         if (!exists[0]) {
-          const name1 = `${fighter1.collection} #${_.truncate(fighter1.token_id, { length: 7 })}`;
-          const name2 = `${fighter2.collection} #${_.truncate(fighter2.token_id, { length: 7 })}`;
+          const name1 = `${player1.collection} #${_.truncate(player1.token_id, { length: 7 })}`;
+          const name2 = `${player2.collection} #${_.truncate(player2.token_id, { length: 7 })}`;
 
           const image = await nodeHtmlToImage({
             html: `
@@ -163,10 +172,10 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
                   </div>
                   <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
                     <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
-                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter1.image_url}" />
+                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${player1.image_url}" />
                     </div>
                     <div style="border: 2px solid #1A202C; width: 508px; height: 508px;">
-                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${fighter2.image_url}" />
+                      <img style="width: 508px; height: 508px; opacity: 0.6;" src="${player2.image_url}" />
                     </div>
                   </div>
                 </body>
@@ -180,12 +189,12 @@ export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, b
 
         const simulationDoc = await db.collection('nft-death-games').doc('season_0').collection('simulations')
           .add({
-            collection1: fighter1.collection,
-            player1: fighter1.id,
-            collection2: fighter2.collection,
-            player2: fighter2.id,
-            fighter1,
-            fighter2,
+            collection1: player1.collection,
+            player1: player1.id,
+            collection2: player2.collection,
+            player2: player2.id,
+            fighter1: player1,
+            fighter2: player2,
             block: currentBlock.toString(),
             randomness: randomness.toString(),
             timestamp: moment().format('x'),
