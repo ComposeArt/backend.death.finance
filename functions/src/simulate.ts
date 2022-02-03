@@ -78,7 +78,7 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
     });
 };
 
-export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any, context?: any) => {
+export const simulateFight = async (admin: any, { isSimulated, f1, f2, random, blockNumber }: any) => {
   try {
     const db = admin.firestore();
     const storage = admin.storage();

@@ -55,7 +55,7 @@ export const onUpdateSeason = firebaseFunction.firestore
 // ------------------ //
 
 export const simulateFight = firebaseFunction.https
-  .onCall((params, context) => simulateFunctions.simulateFight(admin, params, context));
+  .onCall((params, context) => simulateFunctions.simulateFight(admin, params));
 
 export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
