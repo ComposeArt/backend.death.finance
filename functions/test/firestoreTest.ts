@@ -8,9 +8,9 @@ admin.initializeApp({
 });
 let db = admin.firestore();
 
-const getFightSimulationResultsFxn = async () => {
-  console.log("getFightSimulationResultsFxn began.");
-  const result = await getFightSimulationResults({
+const getFightSimulation = async () => {
+  console.log("getFightSimulation began.");
+  const _result = await getFightSimulationResults({
     db,
     f1: {
       collection: 'minitaurs-reborn',
@@ -24,14 +24,14 @@ const getFightSimulationResultsFxn = async () => {
     },
     blockNumber: 6310879
   }).catch((error) => {
-    console.log("getFightSimulationResultsFxn received error %s", error);
+    console.error("getFightSimulation failed with error: %s", error);
   });
-  console.log("getFightSimulationResultsFxn %s", result);
+  console.log("getFightSimulation succeded.");
 };
 
 const runTests = async () => {
   console.log("--- BEGINNING FIRESTORETEST ---");
-  await getFightSimulationResultsFxn();
+  await getFightSimulation();
   console.log("--- END FIRESTORETEST ---\n\n");
 }
 runTests();

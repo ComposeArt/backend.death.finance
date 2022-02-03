@@ -52,7 +52,7 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
 export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
   try {
-    console.log(`Retrieving randomness value with blockNumber ${blockNumber}`);
+    console.log(`getFightSimulationResults retrieving randomness value with blockNumber ${blockNumber}`);
     const randomness = await fightClub.getRandomness({ blockTag: blockNumber });
     const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
     return {
@@ -60,7 +60,7 @@ export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any
       randomness: randomness.toString(),
     };
   } catch (error) {
-    console.error(`getFightSimulationResults ${error}`);
+    console.error(`getFightSimulationResults failed with error: ${error}`);
     throw new Error(`getFightSimulationResults failed.`);
   }
 };
