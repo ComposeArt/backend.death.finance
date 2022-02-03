@@ -5,7 +5,7 @@ import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
-import { fighter1, fighter2 } from "./dataSetup";
+import { fighter1, fighter2 } from "./testData";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',

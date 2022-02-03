@@ -1,21 +1,12 @@
 require('dotenv').config();
 
 import * as admin from 'firebase-admin';
-import { getFightSimulationResults } from "../src/simulate";
+import {fighter1, fighter2} from "./testData";
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
 });
 let db = admin.firestore();
-export const fighter1 = {
-  collection: 'minitaurs-reborn',
-  id: '182521675',
-};
-
-export const fighter2 = {
-  collection: 'galaktic-gang',
-  id: '150340670',
-};
 
 const setupGoerli = async () => {
   console.log("setupGoerli began.");
