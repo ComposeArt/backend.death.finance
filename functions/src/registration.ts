@@ -9,7 +9,8 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
     console.log(`On OpenSea, fetching contract ${contract} and token ${token_id}.`);
     const openSeaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
       headers: {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+        'X-API-KEY': functions.config().opensea.key
       }
     });
 
