@@ -1,6 +1,60 @@
 import moment from 'moment';
 import fetch from 'node-fetch';
+import _ from 'lodash';
 import * as functions from 'firebase-functions';
+
+const getAssets = async ({
+  results,
+  address,
+  offset,
+}: any): Promise<any> => {
+  const response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${address}&limit=50&offset=${offset}`, {
+    headers: {
+      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+      'X-API-KEY': functions.config().opensea.key
+    }
+  });
+
+  const data = await response.json();
+
+  results = [...results, ...data.assets];
+
+  if (data.assets && data.assets.length > 0) {
+    return getAssets({
+      results,
+      address,
+      offset: offset + 50,
+    });
+  } else {
+    return results;
+  }
+};
+
+export const getAddressNFTs = async (admin: any, { ownerAddress }: any, context: any) => {
+  const db = admin.firestore();
+
+  try {
+    const collectionDocs = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('collections')
+      .get();
+
+    const collections: any = [];
+
+    collectionDocs.forEach((collectionDoc: any) => collections.push(collectionDoc.id));
+
+    const assets = await getAssets({
+      results: [],
+      address: ownerAddress,
+      offset: 0,
+    });
+
+    return _.filter(assets, (a: any) => _.find(collections, (c: any) => c === a.collection.slug));
+  } catch (error) {
+    const msg = getErrorMessage(error);
+    throw new functions.https.HttpsError('internal', msg || 'failed to get nfts');
+  }
+};
 
 export const registerFighter = async (admin: any, { ownerAddress, collection, contract, token_id, playerId }: any, context: any) => {
   const db = admin.firestore();

@@ -59,3 +59,6 @@ export const simulateFight = firebaseFunction.https
 
 export const registerFighter = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.registerFighter(admin, params, context));
+
+export const getAddressNFTs = firebaseFunction.https
+  .onCall((params, context) => registrationFunctions.getAddressNFTs(admin, params, context));

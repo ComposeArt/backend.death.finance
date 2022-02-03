@@ -60,8 +60,8 @@ export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any
       randomness: randomness.toString(),
     };
   } catch (error) {
-    console.error(`getFightSimulationResults ${error}`)
-    throw new Error(`getFightSimulationResults failed.`)
+    console.error(`getFightSimulationResults ${error}`);
+    throw new Error(`getFightSimulationResults failed.`);
   }
 };
 

@@ -441,7 +441,7 @@ export const updateSeason = async (change: any, db: any) => {
   try {
     if (!previous.updateStats && updatedSeason.updateStats) {
       await seasonFunctions.updateCumulativeSeasonStats(updatedSeason.id, db);
-    };
+    }
   } catch (error) {
     console.error(error);
   }
