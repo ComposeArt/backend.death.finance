@@ -8,20 +8,6 @@ admin.initializeApp({
 });
 let db = admin.firestore();
 
-const setupGoerliForTest = async () => {
-  console.log("setupGoerliForTest began.");
-  try {
-    await db.collection('chains').doc('goerli').create({
-      blockNumber: 3,
-      contractAddress: "0xc16e8A86E3834E04AfFADC3bFDFD3FA502190c1B",
-      randomness: "84609896496648691675909856943781"
-    });
-    console.log(`setupGoerliForTest succeeded.`)
-  } catch (error) {
-    console.error(`setupGoerliForTest error: ${error}`);
-  }
-}
-
 const getFightSimulationResultsFxn = async () => {
   console.log("getFightSimulationResultsFxn began.");
   const result = await getFightSimulationResults({
@@ -44,7 +30,8 @@ const getFightSimulationResultsFxn = async () => {
 };
 
 const runTests = async () => {
-  await setupGoerliForTest();
+  console.log("--- BEGINNING FIRESTORETEST ---");
   await getFightSimulationResultsFxn();
+  console.log("--- END FIRESTORETEST ---\n\n");
 }
 runTests();
