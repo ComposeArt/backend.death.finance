@@ -36,7 +36,7 @@ export const onCreateMatch = firebaseFunction.firestore
 
 export const onUpdateMatch = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/matches/{matchId}')
-  .onCreate((snap, context) => triggerFunctions.updateMatch(admin, snap, context));
+  .onUpdate(async (change, context) => await triggerFunctions.updateMatch(change, admin));
 
 export const onUpdateBlock = firebaseFunction.firestore
   .document('chains/goerli')

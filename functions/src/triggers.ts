@@ -36,7 +36,7 @@ export const createFighter = async (admin: any, snap: any) => {
   }
 };
 
-export const updateMatch = async (change: any, context: any, admin: any) => {
+export const updateMatch = async (change: any, admin: any) => {
   const db = admin.firestore();
   const storage = admin.storage();
 
