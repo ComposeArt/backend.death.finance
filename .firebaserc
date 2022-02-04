@@ -1,6 +1,7 @@
 {
   "projects": {
-    "prod": "composeart-f9a7a"
+    "prod": "composeart-f9a7a",
+    "default": "composeart-f9a7a"
   },
   "targets": {}
 }

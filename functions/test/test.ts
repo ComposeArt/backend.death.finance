@@ -60,13 +60,13 @@ const getErrorMessage = (error: unknown) => {
 const simulateFightFxn = async () => {
   try {
     let response: any = await simulateFight({
-      isSimulated: false,
+      isSimulated: true,
       player1Id: testData.player1.id,
       player1Collection: testData.player1.collection,
       player2Id: testData.player2.id,
       player2Collection: testData.player2.collection,
       random: '1',
-      blockNumber: '1'
+      blockNumber: '11'
     });
     response = response.data;
 

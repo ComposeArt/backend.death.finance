@@ -194,6 +194,12 @@ const updateCollectionImage = async (db: any, storage: any, fighter: any) => {
 
   const players: any = [];
 
+  const numberOfPlayers = playerDocs.docs.length;
+  if (numberOfPlayers < 4) {
+    console.error(`upadateCollectionImage unable to create new collection image, only ${numberOfPlayers} players, needs four.`);
+    return;
+  }
+
   playerDocs.forEach(async (playerDoc: any) => {
     if (players.length < 4) {
       players.push(playerDoc.data());
