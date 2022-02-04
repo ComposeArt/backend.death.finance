@@ -11,7 +11,7 @@ export const createMatch = async (snap: any, admin: any) => {
   const match = snap.data();
 
   try {
-    await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(match.id).update({
+    await db.collection('nft-death-games').doc('season_0').collection('matches').doc(match.id).update({
       updateImage: true,
     });
   } catch (error) {
