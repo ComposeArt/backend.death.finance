@@ -8,23 +8,9 @@ admin.initializeApp({
 });
 let db = admin.firestore();
 
-const setupGoerliForTest = async () => {
-  console.log("setupGoerliForTest began.");
-  try {
-    await db.collection('chains').doc('goerli').create({
-      blockNumber: 3,
-      contractAddress: "0xc16e8A86E3834E04AfFADC3bFDFD3FA502190c1B",
-      randomness: "84609896496648691675909856943781"
-    });
-    console.log(`setupGoerliForTest succeeded.`)
-  } catch (error) {
-    console.error(`setupGoerliForTest error: ${error}`);
-  }
-}
-
-const getFightSimulationResultsFxn = async () => {
-  console.log("getFightSimulationResultsFxn began.");
-  const result = await getFightSimulationResults({
+const getFightSimulation = async () => {
+  console.log("getFightSimulation began.");
+  const _result = await getFightSimulationResults({
     db,
     f1: {
       collection: 'minitaurs-reborn',
@@ -38,13 +24,14 @@ const getFightSimulationResultsFxn = async () => {
     },
     blockNumber: 6310879
   }).catch((error) => {
-    console.log("getFightSimulationResultsFxn received error %s", error);
+    console.error("getFightSimulation failed with error: %s", error);
   });
-  console.log("getFightSimulationResultsFxn %s", result);
+  console.log("getFightSimulation succeded.");
 };
 
 const runTests = async () => {
-  await setupGoerliForTest();
-  await getFightSimulationResultsFxn();
+  console.log("--- BEGINNING FIRESTORETEST ---");
+  await getFightSimulation();
+  console.log("--- END FIRESTORETEST ---\n\n");
 }
 runTests();

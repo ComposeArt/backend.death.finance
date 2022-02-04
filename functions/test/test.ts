@@ -5,6 +5,7 @@ import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/
 import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
+import * as testData from "./testData";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -19,29 +20,31 @@ const simulateFight = httpsCallable(functions, 'simulateFight');
 const registerFighter = httpsCallable(functions, 'registerFighter');
 
 const registerFighterFxn = async () => {
-  const result = await registerFighter({
+  console.log("registerFighterFxn began.");
+  const _result = await registerFighter({
     ownerAddress: '0xe2b9f0757a9e2813fae323aefd89ec8be706104a',
     collection: 'flowtys',
     contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
     token_id: '7910',
     playerId: 56020219
   }).catch((error) => {
-    console.log("registerFighterFxn received error %s", getErrorMessage(error));
+    console.log("registerFighterFxn failed, received error %s", getErrorMessage(error));
   });
-  console.log("registerFighterFxn result: %s", result);
+  console.log("registerFighterFxn succeeded.");
 };
 
 const registerAnotherFighterFxn = async () => {
-  const result = await registerFighter({
+  console.log("registerAnotherFighterFxn began.");
+  const _result = await registerFighter({
     ownerAddress: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
     collection: 'flowtys',
     contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
     token_id: '2413',
     playerId: 56003240
   }).catch((error) => {
-    console.log("registerAnotherFighterFxn received error %s", getErrorMessage(error));
+    console.log("registerAnotherFighterFxn failed, received error %s", getErrorMessage(error));
   });
-  console.log("registerAnotherFighterFxn result: %s", result);
+  console.log("registerAnotherFighterFxn succeeded.");
 };
 
 const getErrorMessage = (error: unknown) => {
@@ -55,50 +58,46 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const simulateFightFxn = async () => {
+  try {
+    let response: any = await simulateFight({
+      isSimulated: false,
+      player1Id: testData.player1.id,
+      player1Collection: testData.player1.collection,
+      player2Id: testData.player2.id,
+      player2Collection: testData.player2.collection,
+      random: '1',
+      blockNumber: '1'
+    });
+    response = response.data;
 
-  let response: any = await simulateFight({
-    isSimulated: false,
-    f1: {
-      collection: 'minitaurs-reborn',
-      id: '182521675',
-    },
-    f2: {
-      collection: 'galaktic-gang',
-      id: '150340670',
-    },
-    random: '1',
-    blockNumber: '1'
-  });
-  response = response.data;
+    let secondaryResponse: any = await simulateFight({
+      isSimulated: true,
+      player1Id: testData.player1.id,
+      player1Collection: testData.player1.collection,
+      player2Id: testData.player2.id,
+      player2Collection: testData.player2.collection,
+      random: response.randomness.toString(),
+      blockNumber: response.blockNumber.toString()
+    });
 
-  let secondaryResponse: any = await simulateFight({
-    isSimulated: true,
-    f1: {
-      collection: 'minitaurs-reborn',
-      id: '182521675',
-    },
-    f2: {
-      collection: 'galaktic-gang',
-      id: '150340670',
-    },
-    random: response.randomness.toString(),
-    blockNumber: response.blockNumber.toString()
-  });
+    secondaryResponse = secondaryResponse.data;
+    console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
 
-  secondaryResponse = secondaryResponse.data;
-  console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
-
-  let eventLog = response.eventLog;
-  const EVENT_SIZE = 9;
-  let isTie = (eventLog.length % EVENT_SIZE) == 1;
-  for (let i = 1; i < eventLog.length - 1; i += EVENT_SIZE) {
-    console.log(`${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P1 Attack:" : "P2 Attack:"} ${parseInt(eventLog.substring(i + 1, i + 5), 2)}, ${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P2 Counter:" : "P1 Counter:"} ${parseInt(eventLog.substring(i + 5, i + EVENT_SIZE), 2)}`);
+    let eventLog = response.eventLog;
+    const EVENT_SIZE = 9;
+    let isTie = (eventLog.length % EVENT_SIZE) == 1;
+    for (let i = 1; i < eventLog.length - 1; i += EVENT_SIZE) {
+      console.log(`${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P1 Attack:" : "P2 Attack:"} ${parseInt(eventLog.substring(i + 1, i + 5), 2)}, ${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P2 Counter:" : "P1 Counter:"} ${parseInt(eventLog.substring(i + 5, i + EVENT_SIZE), 2)}`);
+    }
+    console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
+  } catch (error) {
+    console.error(`simulateFightFxn failed: ${error}`);
   }
-  console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
 }
 
 const simulateMatchStatsFighter2Fucked = () => {
   // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
+  console.log(`simulateMatchStatsPlayer2Fucked began.`);
   const f1 = {
     attack: 9,
     defense: 14,
@@ -125,11 +124,12 @@ const simulateMatchStatsFighter2Fucked = () => {
     "11000100110111100000010000001001101000010100000",
     f1,
     f2);
-  console.log(`simulateMatchStatsPlayer2Fucked results: ${JSON.stringify(result)}`);
+  console.log(`simulateMatchStatsPlayer2Fucked results: ${JSON.stringify(result)}\n`);
 };
 
 const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
+  console.log(`simulateMatchStatsTieDyeOnTieDyeViolence began.`);
   const f1 = {
     attack: 6,
     defense: 10,
@@ -156,10 +156,11 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
     "10011100001101000000011000001000000100101000001100001000101000001110011000010000001010101001",
     f1,
     f2);
-  console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}`);
+  console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}\n`);
 };
 
 const totalFighterStats = () => {
+  console.log(`totalFighterStats began.`);
   const id = "139776475";
   const match1 = {
     fighter1: id,
@@ -202,7 +203,7 @@ const totalFighterStats = () => {
   };
 
   const result = totalStatsForMatches(id, [match1, match2]);
-  console.log(`totalFighterStats results: ${JSON.stringify(result)}`);
+  console.log(`totalFighterStats results: ${JSON.stringify(result)}\n`);
 };
 
 const totalCollectionStats = () => {
@@ -239,7 +240,7 @@ const totalCollectionStats = () => {
   };
 
   const result = addCumulativeStats(fighter1Stats, fighter2Stats);
-  console.log(`totalCollectionStats results: ${JSON.stringify(result)}`);
+  console.log(`totalCollectionStats results: ${JSON.stringify(result)}\n`);
 };
 
 const rankFighters = () => {
