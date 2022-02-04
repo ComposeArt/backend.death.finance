@@ -36,21 +36,22 @@ export const updateFighterRankings = async (seasonId: string, db: any) => {
 
   try {
     const allFighters = await fightersPath
-    .where('is_doping', '==', false)
-    .where('is_invalid', '==', false)
-    .where('statsDone', '==', true)
-    .get();
+      .where('is_doping', '==', false)
+      .where('is_invalid', '==', false)
+      .where('statsDone', '==', true)
+      .get();
 
-    await Promise.all(allFighters
-      .map((fighter: any) => fighter.data())
-      .sort(compareFighters)
-      .map(async (fighter: any, index: number) => {
-        return await fightersPath
-          .doc(fighter.id)
-          .update({
-            ranking: index
-          });
-      }));
+    await Promise.all(
+      allFighters.docs
+        .map((fighter: any) => fighter.data())
+        .sort(compareFighters)
+        .map(async (fighter: any, index: number) => {
+          return await fightersPath
+            .doc(fighter.id)
+            .update({
+              ranking: index
+            });
+        }));
   } catch (error) {
     console.error(error);
     throw new Error(`updateFighterRankings failed ${error}`);
