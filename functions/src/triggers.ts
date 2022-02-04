@@ -6,12 +6,12 @@ import * as matchesFunctions from './matches/matches';
 import * as collectionFunctions from './collection';
 import * as seasonFunctions from './season';
 
-export const createMatch = async (admin: any, snap: any, context: any) => {
+export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
-  const match = snap.after.data() || {};
+  const match = snap.data();
 
   try {
-    await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(match.id).update({
+    await db.collection('nft-death-games').doc('season_0').collection('matches').doc(match.id).update({
       updateImage: true,
     });
   } catch (error) {
@@ -19,9 +19,9 @@ export const createMatch = async (admin: any, snap: any, context: any) => {
   }
 };
 
-export const createFighter = async (admin: any, snap: any) => {
+export const createFighter = async (snap: any, admin: any) => {
   const db = admin.firestore();
-  const fighter = snap.data() || {};
+  const fighter = snap.data();
 
   registrationFunctions.schedulePreSeasonMatches(admin, snap);
 
@@ -36,7 +36,7 @@ export const createFighter = async (admin: any, snap: any) => {
   }
 };
 
-export const updateMatch = async (change: any, context: any, admin: any) => {
+export const updateMatch = async (change: any, admin: any) => {
   const db = admin.firestore();
   const storage = admin.storage();
 
@@ -56,7 +56,7 @@ export const updateMatch = async (change: any, context: any, admin: any) => {
   }
 };
 
-export const updateFighter = async (change: any, context: any, admin: any) => {
+export const updateFighter = async (change: any, admin: any) => {
   const db = admin.firestore();
   const storage = admin.storage();
 

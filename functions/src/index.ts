@@ -24,19 +24,19 @@ export const updateGoerli = firebaseFunction.pubsub
 
 export const onCreateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-  .onCreate((snap, context) => triggerFunctions.createFighter(admin, snap));
+  .onCreate(async (snap, context) => await triggerFunctions.createFighter(snap, admin));
 
 export const onUpdateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
-  .onUpdate(async (change, context) => await triggerFunctions.updateFighter(change, context, admin));
+  .onUpdate(async (change, context) => await triggerFunctions.updateFighter(change, admin));
 
 export const onCreateMatch = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/matches/{matchId}')
-  .onCreate((snap, context) => triggerFunctions.createMatch(admin, snap, context));
+  .onCreate(async (snap, context) => await triggerFunctions.createMatch(snap, admin));
 
 export const onUpdateMatch = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/matches/{matchId}')
-  .onCreate((snap, context) => triggerFunctions.updateMatch(admin, snap, context));
+  .onUpdate(async (change, context) => await triggerFunctions.updateMatch(change, admin));
 
 export const onUpdateBlock = firebaseFunction.firestore
   .document('chains/goerli')
