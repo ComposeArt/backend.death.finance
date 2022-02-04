@@ -24,6 +24,8 @@ export const player1 = {
 export const fighter1 = {
   collection: 'minitaurs-reborn',
   id: '182521675',
+  is_invalid: false,
+  is_doping: false,
   owner: '0xe9e9206b598f6fc95e006684fe432f100e876110',
   player: player1
 };
@@ -52,6 +54,8 @@ export const player2 = {
 export const fighter2 = {
   collection: 'galaktic-gang',
   id: '150340670',
+  is_invalid: false,
+  is_doping: false,
   owner: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
   player: player2
 };

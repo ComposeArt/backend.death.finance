@@ -58,11 +58,28 @@ const setupFighters = async () => {
   }
 }
 
+const setupSeason = async () => {
+  console.log("setupSeason began.");
+  const path = db
+    .collection('nft-death-games')
+    .doc('season_0');
+  try {
+    await path.create({id: 'season_0'});
+    await path.update({
+      updateFighterRankings: true
+    });
+    console.log(`setupSeason succeeded.`)
+  } catch (error) {
+    console.error(`setupSeason failed, error: ${error}`);
+  }
+}
+
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING DATA SETUP ---");
   await setupGoerli();
   await setupCollections();
   await setupFighters();
+  await setupSeason();
   console.log("--- END DATA SETUP ---\n\n");
 }
 runTestDataSetup();
