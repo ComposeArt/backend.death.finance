@@ -7,7 +7,7 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions --project composeart-f9a7a",
-    "deploy:test": "firebase deploy --only functions --project deathfinance",
+    "deploy:dev": "firebase deploy --only functions --project deathfinance",
     "logs": "firebase functions:log",
     "test": "npx ts-node test/dataSetup.ts; npx ts-node test/test.ts; npx ts-node test/firestoreTest.ts"
   },

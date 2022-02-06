@@ -402,36 +402,41 @@ export const updateFighterStats = async (db: any, fighter: any) => {
 export const updateBlock = async (change: any, admin: any) => {
   const db = admin.firestore();
 
-  const newBlockNumber = change.after.data().blockNumber;
-  console.log('newBlockNumber received %s', newBlockNumber);
-  const matchesForBlock = await simulateFunctions.getMatchesForBlock(db, newBlockNumber);
-  const fightResults = await Promise.all(matchesForBlock.docs.map(async (match: any) => {
-    return await simulateFunctions.getFightSimulationResults({
-      db,
-      f1: match.player1,
-      f2: match.player2,
-      blockNumber: newBlockNumber,
-    });
-  }));
-  console.log('fightResults for block %s: %s', newBlockNumber, fightResults);
+  const previous = change.before.data();
+  const updatedChain = change.after.data();
 
-  await Promise.all(fightResults.map(async (fightResult: any) => {
+  if (previous.blockNumber !== updatedChain.blockNumber) {
     try {
-      const saveResult = await simulateFunctions.saveFightResultsToMatch(
-        db,
-        fightResult.id,
-        fightResult.fightLog,
-        fightResult.randomness);
-      console.log(`saveFightResultsToMatch ${fightResult.id} result: ${saveResult}`);
+      const newBlockNumber = updatedChain.blockNumber;
+
+      const matchesForBlock = await simulateFunctions.getMatchesForBlock(db, newBlockNumber);
+
+      const fightResults = await Promise.all(matchesForBlock.docs.map(async (match: any) => {
+        return await simulateFunctions.getFightSimulationResults({
+          db,
+          f1: match.player1,
+          f2: match.player2,
+          blockNumber: newBlockNumber,
+        });
+      }));
+
+      await Promise.all(fightResults.map(async (fightResult: any) => {
+        await simulateFunctions.saveFightResultsToMatch(
+          db,
+          fightResult.id,
+          fightResult.fightLog,
+          fightResult.randomness);
+      }));
     } catch (error) {
-      console.log(`saveFightResultsToMatch error: ${getErrorMessage(error)}`);
+      console.error(error);
     }
-  }));
+  }
 };
 
 export const updateCollection = async (change: any, db: any) => {
   const previous = change.before.data();
   const updatedCollection = change.after.data();
+
   try {
     if (!previous.updateStats && updatedCollection.updateStats) {
       await collectionFunctions.updateCumulativeCollectionStats(updatedCollection, db);

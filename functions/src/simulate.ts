@@ -39,10 +39,6 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
       .where('block', '==', blockNumber)
       .get();
 
-    if (!matches.exists) {
-      throw new Error(`no matches for block ${blockNumber}`);
-    }
-
     return matches;
   } catch (error) {
     throw new Error(`getMatchesForBlock error ${getErrorMessage(error)}`);
@@ -146,7 +142,7 @@ export const simulateFight = async (
         const bucket = storage.bucket();
         const fileName = `simulations/${player1.collection}_${player1.token_id}_${player2.collection}_${player2.token_id}.png`;
         const file = bucket.file(fileName);
-        const fileUrl = `https://storage.googleapis.com/composeart-f9a7a.appspot.com/${fileName}`;
+        const fileUrl = `https://storage.googleapis.com/${functions.config().app.id}.appspot.com/${fileName}`;
 
         const exists = await file.exists();
 
@@ -164,10 +160,10 @@ export const simulateFight = async (
                   <div style="width: 256px; height: 256px; position: absolute; z-index: 10; left: 384px; top: 128px;">
                     <img style="width: 256px; height: 256px;" src="https://death.finance/fight-club-logo-light.png" />
                   </div>
-                  <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 508px; height: 80px; position: absolute; z-index: 10; left: 0; bottom: 100px;">
+                  <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; left: 16px; bottom: 100px;">
                     ${name1}
                   </div>
-                  <div style=" font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 508px; height: 80px; position: absolute; z-index: 10; right: 0; bottom: 100px;">
+                  <div style=" font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; right: 16px; bottom: 100px;">
                     ${name2}
                   </div>
                   <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
