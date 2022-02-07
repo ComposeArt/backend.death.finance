@@ -210,51 +210,43 @@ const getErrorMessage = (error: unknown) => {
 };
 
 export const schedulePreSeasonMatches = async (
-  admin: any,
-  snapshot: any,
+  db: any,
+  fighter: any,
 ) => {
-  const db = admin.firestore();
-
-  const newFighter = snapshot.data();
-  console.log('Scheduling pre-season fights for fighter %s', newFighter);
-
   const allFighterSnapshot = await db.collection('nft-death-games')
     .doc('season_0')
     .collection('fighters')
     .where('is_doping', '==', false)
     .where('is_invalid', '==', false)
-    .where('id', '!=', newFighter.id)
+    .where('id', '!=', fighter.id)
     .get();
 
   let currentBlock = await getCurrentBlockNumber(db);
 
-  const allFighters = allFighterSnapshot.docs.map((fighter: any) => fighter.data());
-  // TODO: Parallelize these writes https://github.com/ComposeArt/backend/issues/8
-  allFighters.forEach(async (otherFighter: any) => {
-    if (currentBlock % 5 === 0) {
-      currentBlock += 1;
-    }
-    const matchesCollection = await db.collection('nft-death-games')
-      .doc('season_0')
-      .collection('matches');
+  currentBlock += 100;
 
-    // Each preseason matchup gets two fights. Here's first.
-    const firstMatch = await matchesCollection
-      .doc(`${newFighter.id}-${otherFighter.id}`)
-      .get();
-    if (!firstMatch.exists) {
-      await scheduleMatch(db, newFighter, otherFighter, currentBlock);
-      currentBlock += 1;
+  const allFighters = allFighterSnapshot.docs.map((f: any) => f.data());
+
+  await Promise.all(allFighters.map(async (otherFighter: any) => {
+    currentBlock += 1;
+
+    if (_.floor(currentBlock / 10 % 2) === 0) {
+      currentBlock += 10;
     }
 
-    // Second matchup between the same fighters.
-    const secondMatch = await matchesCollection
-      .doc(`${newFighter.id}-${otherFighter.id}`)
-      .get();
-    if (!secondMatch.exists) {
-      await scheduleMatch(db, otherFighter, newFighter, currentBlock);
-      currentBlock += 1;
+    await scheduleMatch(db, fighter, otherFighter, currentBlock);
+
+    currentBlock += 1;
+
+    if (_.floor(currentBlock / 10 % 2) === 0) {
+      currentBlock += 10;
     }
+
+    await scheduleMatch(db, otherFighter, fighter, currentBlock);
+  }));
+
+  await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
+    updateMatches: false,
   });
 };
 
@@ -265,11 +257,10 @@ const getCurrentBlockNumber = async (db: any): Promise<number> => {
   return goerli.data().blockNumber;
 };
 
-const scheduleMatch = async (database: any, firstFighter: any, secondFighter: any, block: number) => {
-  const matchesCollection = database.collection('nft-death-games')
+const scheduleMatch = async (db: any, firstFighter: any, secondFighter: any, block: number) => {
+  await db.collection('nft-death-games')
     .doc('season_0')
-    .collection('matches');
-  await matchesCollection
+    .collection('matches')
     .doc(`${firstFighter.id}-${secondFighter.id}`)
     .set({
       id: `${firstFighter.id}-${secondFighter.id}`,

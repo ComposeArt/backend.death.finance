@@ -44,11 +44,15 @@ export const onUpdateBlock = firebaseFunction.firestore
 
 export const onUpdateCollection = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/collections/{collectionId}')
-  .onUpdate(async (change, context) => await triggerFunctions.updateCollection(change, admin.firestore()));
+  .onUpdate(async (change, context) => await triggerFunctions.updateCollection(change, admin));
 
 export const onUpdateSeason = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}')
-  .onUpdate(async (change, context) => await triggerFunctions.updateSeason(change, admin.firestore()));
+  .onUpdate(async (change, context) => await triggerFunctions.updateSeason(change, admin));
+
+export const onUpdateUser = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/users/{userId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateUser(change, admin));
 
 // ------------------ //
 //      CALLABLE      //

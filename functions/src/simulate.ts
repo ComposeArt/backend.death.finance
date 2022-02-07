@@ -160,10 +160,10 @@ export const simulateFight = async (
                   <div style="width: 256px; height: 256px; position: absolute; z-index: 10; left: 384px; top: 128px;">
                     <img style="width: 256px; height: 256px;" src="https://death.finance/fight-club-logo-light.png" />
                   </div>
-                  <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; left: 16px; bottom: 100px;">
+                  <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; left: 6px; bottom: 100px;">
                     ${name1}
                   </div>
-                  <div style=" font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; right: 16px; bottom: 100px;">
+                  <div style=" font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; right: 6px; bottom: 100px;">
                     ${name2}
                   </div>
                   <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
