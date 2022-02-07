@@ -31,24 +31,19 @@ const getFightClubContract = async (db: any) => {
 };
 
 export const getMatchesForBlock = async (db: any, blockNumber: number) => {
-  try {
-    const matches = await db
-      .collection('nft-death-games')
-      .doc('season_0')
-      .collection('matches')
-      .where('block', '==', blockNumber)
-      .get();
+  const matches = await db
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .where('block', '==', blockNumber)
+    .get();
 
-    return matches;
-  } catch (error) {
-    throw new Error(`getMatchesForBlock error ${getErrorMessage(error)}`);
-  }
+  return matches;
 };
 
 export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
   try {
-    console.log(`getFightSimulationResults retrieving randomness value with blockNumber ${blockNumber}`);
     const randomness = await fightClub.getRandomness({ blockTag: blockNumber });
     const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
     return {
@@ -71,6 +66,7 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
       log: fightLog,
       randomness,
       updateStats: true,
+      simulate: false,
     });
 };
 

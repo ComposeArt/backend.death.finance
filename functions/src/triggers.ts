@@ -53,6 +53,22 @@ export const updateMatch = async (change: any, admin: any) => {
       await updateMatchImage(db, storage, match);
     }
 
+    if (!oldMatch.simulate && match.simulate) {
+      const fightResult = await simulateFunctions.getFightSimulationResults({
+        db,
+        f1: match.player1,
+        f2: match.player2,
+        blockNumber: match.block,
+      });
+
+      await simulateFunctions.saveFightResultsToMatch(
+        db,
+        match.id,
+        fightResult.fightLog,
+        fightResult.randomness
+      );
+    }
+
     if (!oldMatch.updateStats && match.updateStats) {
       await matchesFunctions.updateFighterStatsForMatch(db, match);
     }
@@ -446,21 +462,15 @@ export const updateBlock = async (change: any, admin: any) => {
 
       const matchesForBlock = await simulateFunctions.getMatchesForBlock(db, newBlockNumber);
 
-      const fightResults = await Promise.all(matchesForBlock.docs.map(async (match: any) => {
-        return await simulateFunctions.getFightSimulationResults({
-          db,
-          f1: match.player1,
-          f2: match.player2,
-          blockNumber: newBlockNumber,
-        });
-      }));
-
-      await Promise.all(fightResults.map(async (fightResult: any) => {
-        await simulateFunctions.saveFightResultsToMatch(
-          db,
-          fightResult.id,
-          fightResult.fightLog,
-          fightResult.randomness);
+      await Promise.all(matchesForBlock.docs.map(async (match: any) => {
+        await db
+          .collection('nft-death-games')
+          .doc('season_0')
+          .collection('matches')
+          .doc(match.id)
+          .update({
+            simulate: true,
+          });
       }));
     } catch (error) {
       console.error(error);
