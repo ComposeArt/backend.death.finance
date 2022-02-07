@@ -209,6 +209,10 @@ const getErrorMessage = (error: unknown) => {
   return '';
 };
 
+const isFightingBlock = (blockNumber: number): boolean => {
+  return _.floor(parseInt(blockNumber.toString(), 10) / 10 % 2) === 1;
+}
+
 export const schedulePreSeasonMatches = async (
   db: any,
   fighter: any,
@@ -221,28 +225,27 @@ export const schedulePreSeasonMatches = async (
     .where('id', '!=', fighter.id)
     .get();
 
-  let currentBlock = await getCurrentBlockNumber(db);
-
-  currentBlock += 100;
+  let scheduledMatchBlock = await getCurrentBlockNumber(db);
+  scheduledMatchBlock += 100;
 
   const allFighters = allFighterSnapshot.docs.map((f: any) => f.data());
 
   await Promise.all(allFighters.map(async (otherFighter: any) => {
-    currentBlock += 1;
+    scheduledMatchBlock += 1;
 
-    if (_.floor(currentBlock / 10 % 2) === 0) {
-      currentBlock += 10;
+    if (!isFightingBlock(scheduledMatchBlock)) {
+      scheduledMatchBlock += 10;
     }
 
-    await scheduleMatch(db, fighter, otherFighter, currentBlock);
+    await scheduleMatch(db, fighter, otherFighter, scheduledMatchBlock);
 
-    currentBlock += 1;
+    scheduledMatchBlock += 1;
 
-    if (_.floor(currentBlock / 10 % 2) === 0) {
-      currentBlock += 10;
+    if (!isFightingBlock(scheduledMatchBlock)) {
+      scheduledMatchBlock += 10;
     }
 
-    await scheduleMatch(db, otherFighter, fighter, currentBlock);
+    await scheduleMatch(db, otherFighter, fighter, scheduledMatchBlock);
   }));
 
   await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
