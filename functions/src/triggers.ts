@@ -106,7 +106,7 @@ const updateProfileImage = async (db: any, storage: any, user: any) => {
     .doc('season_0')
     .collection('fighters')
     .where('owner', '==', user.address)
-    .orderBy('power', 'desc')
+    .orderBy('timestamp', 'desc')
     .limit(4)
     .get();
 
