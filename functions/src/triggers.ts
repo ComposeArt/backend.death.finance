@@ -440,7 +440,7 @@ export const updateFighterStats = async (db: any, fighter: any) => {
       matches.push(fighter2Match.data().stats2);
     });
 
-    const stats = matchesFunctions.totalStatsForMatches(fighter.id, matches);
+    const stats = matchesFunctions.totalStatsForMatches(matches);
 
     await db
       .collection('nft-death-games')

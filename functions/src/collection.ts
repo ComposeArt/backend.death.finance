@@ -6,15 +6,17 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
     .collection('nft-death-games')
     .doc('season_0');
   try {
-    const fighters = await seasonPath
+    const fighterDocs = await seasonPath
       .collection('fighters')
       .where('collection', '==', collection.id)
       .where('statsDone', '==', true)
       .get();
 
-    const collectionStats: ICumulativeStats = fighters
-      .map((fighter: any) => fighter.stats)
-      .reduce(addCumulativeStats);
+    const fighters: any = [];
+
+    fighterDocs.forEach((fighterDoc: any) => fighters.push(fighterDoc.data().stats));
+
+    const collectionStats: ICumulativeStats = fighters.reduce(addCumulativeStats);
 
     await seasonPath
       .collection('collections')
@@ -35,6 +37,7 @@ export const addCumulativeStats = (
   currentFighterStats: ICumulativeStats
 ): ICumulativeStats => {
   return {
+    matches: cumulativeStats.matches + currentFighterStats.matches,
     won: cumulativeStats.won + currentFighterStats.won,
     knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentFighterStats.knockedOutOpponent,
     perfectedOpponent: cumulativeStats.perfectedOpponent + currentFighterStats.perfectedOpponent,

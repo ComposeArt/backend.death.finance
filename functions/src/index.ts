@@ -18,6 +18,10 @@ export const updateGoerli = firebaseFunction.pubsub
   .schedule('every 1 minutes')
   .onRun(async () => scheduleFunctions.updateGoerli(admin));
 
+export const updateCollectionStats = firebaseFunction.pubsub
+  .schedule('every 1 hours')
+  .onRun(async () => scheduleFunctions.updateCollectionStats(admin));
+
 // ------------------ //
 //      TRIGGERS      //
 // ------------------ //

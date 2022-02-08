@@ -42,6 +42,33 @@ export const updateGoerli = async (admin: any) => {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('Export operation failed');
+  }
+};
+
+export const updateCollectionStats = async (admin: any) => {
+  try {
+    const db = admin.firestore();
+
+    const collectionDocs = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('collections')
+      .get();
+
+    const collections: any = [];
+
+    collectionDocs.forEach((collectionDoc: any) => collections.push(collectionDoc.id));
+
+    await Promise.all(collections.map(async (id: string) => {
+      await db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('collections')
+        .doc(id)
+        .update({
+          updateStats: true,
+        });
+    }));
+  } catch (error) {
+    console.error(error);
   }
 };
