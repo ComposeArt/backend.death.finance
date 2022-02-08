@@ -5,6 +5,7 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
   const seasonPath = db
     .collection('nft-death-games')
     .doc('season_0');
+
   try {
     const fighterDocs = await seasonPath
       .collection('fighters')
@@ -16,7 +17,7 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
 
     fighterDocs.forEach((fighterDoc: any) => fighters.push(fighterDoc.data().stats));
 
-    const collectionStats: ICumulativeStats = fighters.reduce(addCumulativeStats);
+    const collectionStats = fighters.length ? fighters.reduce(addCumulativeStats) : {};
 
     await seasonPath
       .collection('collections')
@@ -26,6 +27,7 @@ export const updateCumulativeCollectionStats = async (collection: any, db: any) 
         updateStats: false,
         statsDone: true,
       });
+
   } catch (error) {
     console.error(error);
     throw new Error(`updateCumulativeCollectionStats failed`);
