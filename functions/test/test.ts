@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
+import { getPerFighterMatchStats, ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
 import * as testData from "./testData";
@@ -125,7 +125,7 @@ const totalFighterStats = () => {
     }
   };
 
-  const result = totalStatsForMatches([match1, match2]);
+  const result = cumulativeStatsFromArray([match1.stats1, match2.stats1]);
   console.log(`totalFighterStats results: ${JSON.stringify(result)}\n`);
 };
 

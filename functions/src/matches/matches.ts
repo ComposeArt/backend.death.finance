@@ -36,10 +36,10 @@ export interface ICumulativeStats {
   damageReceived: number;
 }
 
-export const totalStatsForMatches = (matches: any[]): ICumulativeStats => {
-  return matches.reduce((cumulativeStats, currentMatchStats) => {
+export const cumulativeStatsFromArray = (stats: any[]): ICumulativeStats => {
+  return stats.reduce((cumulativeStats, currentMatchStats) => {
     return {
-      matches: matches.length,
+      matches: stats.length,
       won: cumulativeStats.won + currentMatchStats.won,
       knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentMatchStats.knockedOutOpponent,
       perfectedOpponent: cumulativeStats.perfectedOpponent + currentMatchStats.perfectedOpponent,
