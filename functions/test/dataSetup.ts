@@ -12,7 +12,7 @@ const setupGoerli = async () => {
   console.log("setupGoerli began.");
   try {
     await db.collection('chains').doc('goerli').create({
-      blockNumber: 3,
+      blockNumber: "6345212",
       contractAddress: "0x463146588e0c6E6899A9140D9DB488B2354E3775",
       randomness: "84609896496648691675909856943781"
     });

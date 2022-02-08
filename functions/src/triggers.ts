@@ -58,7 +58,7 @@ export const updateMatch = async (change: any, admin: any) => {
         db,
         f1: match.player1,
         f2: match.player2,
-        blockNumber: match.block,
+        blockNumber: match.block.toString(),
       });
 
       await simulateFunctions.saveFightResultsToMatch(
