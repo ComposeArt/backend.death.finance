@@ -211,7 +211,7 @@ const getErrorMessage = (error: unknown) => {
 
 const isFightingBlock = (blockNumber: number): boolean => {
   return _.floor(parseInt(blockNumber.toString(), 10) / 10 % 2) === 1;
-}
+};
 
 export const schedulePreSeasonMatches = async (
   db: any,

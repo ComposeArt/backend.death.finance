@@ -202,12 +202,13 @@ const totalFighterStats = () => {
     }
   };
 
-  const result = totalStatsForMatches(id, [match1, match2]);
+  const result = totalStatsForMatches([match1, match2]);
   console.log(`totalFighterStats results: ${JSON.stringify(result)}\n`);
 };
 
 const totalCollectionStats = () => {
   const fighter1Stats: ICumulativeStats = {
+    matches: 9,
     won: 7,
     knockedOutOpponent: 1,
     perfectedOpponent: 3,
@@ -224,6 +225,7 @@ const totalCollectionStats = () => {
   };
 
   const fighter2Stats: ICumulativeStats = {
+    matches: 9,
     won: 2,
     knockedOutOpponent: 11,
     perfectedOpponent: 3,

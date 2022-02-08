@@ -12,7 +12,7 @@ export const player1 = {
   image_thumbnail_url: 'https://lh3.googleusercontent.com/Oz1FGz0PzF-5RZ53qYEmJxJDcFPh35QweEQUVH1OymK9pneRSTQD5gvQdTEM9i7gI9wX2Thiu17SXxvf7uJFC36Gyp4S3nvdHzv3Zw=s128',
   image_url: 'https://lh3.googleusercontent.com/Oz1FGz0PzF-5RZ53qYEmJxJDcFPh35QweEQUVH1OymK9pneRSTQD5gvQdTEM9i7gI9wX2Thiu17SXxvf7uJFC36Gyp4S3nvdHzv3Zw',
   name: 'Minitaur #1740',
-  owner: '0xe9e9206b598f6fc95e006684fe432f100e876110',
+  owner: '0x114599eb5486d027a88a031944db2b0564402a0c',
   permalink: 'https://opensea.io/assets/0xfa10661c28f309b88aecf14d9ab8f24764d6b10d/1740',
   power: 66,
   season: "season_0",
@@ -26,8 +26,13 @@ export const fighter1 = {
   id: '182521675',
   is_invalid: false,
   is_doping: false,
-  owner: '0xe9e9206b598f6fc95e006684fe432f100e876110',
-  player: player1
+  owner: '0x114599eb5486d027a88a031944db2b0564402a0c',
+  player: player1,
+  statsDone: false
+};
+
+export const user1 = {
+  address: '0x114599eb5486d027a88a031944db2b0564402a0c',
 };
 
 export const player2 = {
@@ -51,11 +56,17 @@ export const player2 = {
   special_element: 9,
   tokenId: "1051"
 }
+
 export const fighter2 = {
   collection: 'galaktic-gang',
   id: '150340670',
   is_invalid: false,
   is_doping: false,
   owner: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
-  player: player2
+  player: player2,
+  statsDone: false
+};
+
+export const user2 = {
+  address: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
 };
