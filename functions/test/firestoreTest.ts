@@ -22,7 +22,7 @@ const getFightSimulation = async () => {
       id: '150340670',
       binary_power: 16498619
     },
-    blockNumber: '6310879'
+    blockNumber: '6345212'
   }).catch((error) => {
     console.error("getFightSimulation failed with error: %s", error);
   });
