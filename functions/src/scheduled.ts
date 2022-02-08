@@ -35,7 +35,7 @@ export const updateGoerli = async (admin: any) => {
         .update({
           contractAddress,
           randomness,
-          blockNumber
+          blockNumber: String(blockNumber)
         });
 
       await delay(5000);

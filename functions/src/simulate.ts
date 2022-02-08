@@ -35,7 +35,7 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
     .collection('nft-death-games')
     .doc('season_0')
     .collection('matches')
-    .where('block', '==', blockNumber)
+    .where('block', '==', String(blockNumber))
     .get();
 
   return matches;
@@ -44,10 +44,11 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
 export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
   try {
-    const randomness = await fightClub.getRandomness({ blockTag: blockNumber });
-    const fightLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+    const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 10) });
+    const eventLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+
     return {
-      fightLog,
+      eventLog: BigInt((eventLog).toString().replace('.', '')).toString(2),
       randomness: randomness.toString(),
     };
   } catch (error) {

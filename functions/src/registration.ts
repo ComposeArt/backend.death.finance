@@ -254,7 +254,7 @@ const getCurrentBlockNumber = async (db: any): Promise<number> => {
   const goerli = await db.collection('chains')
     .doc('goerli')
     .get();
-  return goerli.data().blockNumber;
+  return parseInt(goerli.data().blockNumber, 10);
 };
 
 const scheduleMatch = async (db: any, firstFighter: any, secondFighter: any, block: number) => {

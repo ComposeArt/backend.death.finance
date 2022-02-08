@@ -64,7 +64,7 @@ export const updateMatch = async (change: any, admin: any) => {
       await simulateFunctions.saveFightResultsToMatch(
         db,
         match.id,
-        fightResult.fightLog,
+        fightResult.eventLog,
         fightResult.randomness
       );
     }
@@ -422,6 +422,8 @@ export const updateFighterStats = async (db: any, fighter: any) => {
     .collection('matches')
     .where('statsDone', '==', true);
   try {
+    const matches: any = [];
+
     const fighter1Matches = await matchPath
       .where('fighter1', '==', fighter.id)
       .get();
@@ -430,8 +432,15 @@ export const updateFighterStats = async (db: any, fighter: any) => {
       .where('fighter2', '==', fighter.id)
       .get();
 
-    const stats = matchesFunctions
-      .totalStatsForMatches(fighter.id, fighter1Matches.concat(fighter2Matches));
+    fighter1Matches.forEach((fighter1Match: any) => {
+      matches.push(fighter1Match.data().stats1);
+    });
+
+    fighter2Matches.forEach((fighter2Match: any) => {
+      matches.push(fighter2Match.data().stats2);
+    });
+
+    const stats = matchesFunctions.totalStatsForMatches(fighter.id, matches);
 
     await db
       .collection('nft-death-games')

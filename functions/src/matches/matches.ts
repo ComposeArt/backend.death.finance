@@ -36,8 +36,7 @@ export interface ICumulativeStats {
 }
 
 export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeStats => {
-  const allMatchStats = matches.map((match) => (match.fighter1 === fighterId) ? match.stats1 : match.stats2);
-  return allMatchStats.reduce((cumulativeStats, currentMatchStats) => {
+  return matches.reduce((cumulativeStats, currentMatchStats) => {
     return {
       won: cumulativeStats.won + currentMatchStats.won,
       knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentMatchStats.knockedOutOpponent,
@@ -66,11 +65,29 @@ export const updateFighterStatsForMatch = async (
     .doc('season_0')
     .collection('matches')
     .doc(match.id)
-    .set({
+    .update({
       stats1: results.stats1,
       stats2: results.stats2,
       updateStats: false,
       statsDone: true,
+    });
+
+  await db
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('fighters')
+    .doc(match.fighter1)
+    .update({
+      updateStats: true,
+    });
+
+  await db
+    .collection('nft-death-games')
+    .doc('season_0')
+    .collection('fighters')
+    .doc(match.fighter2)
+    .update({
+      updateStats: true,
     });
 };
 
