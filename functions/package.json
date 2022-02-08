@@ -9,7 +9,7 @@
     "deploy": "firebase deploy --only functions --project composeart-f9a7a",
     "deploy:dev": "firebase deploy --only functions --project deathfinance",
     "logs": "firebase functions:log",
-    "test": "npx ts-node test/dataSetup.ts; npx ts-node test/test.ts; npx ts-node test/firestoreTest.ts"
+    "test": "npx ts-node test/dataSetup.ts; npx ts-node test/simulateFightsTest.ts; npx ts-node test/updateStatsTest.ts; npx ts-node test/test.ts; npx ts-node test/firestoreTest.ts"
   },
   "engines": {
     "node": "14"
