@@ -31,13 +31,46 @@ const setupCollections = async () => {
         .doc('season_0')
         .collection('collections')
         .doc(player.collection)
-        .collection('players')
-        .doc(player.id)
-        .create({...player});
+        .create({});
     }));
     console.log(`setupCollections succeeded.`)
   } catch (error) {
     console.error(`setupCollections failed, error: ${error}`);
+  }
+}
+const setupPlayers = async () => {
+  console.log("setupPlayers began.");
+  try {
+    await Promise.all([testData.player1, testData.player2].map(async (player) => {
+      return db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('collections')
+        .doc(player.collection)
+        .collection('players')
+        .doc(player.id)
+        .create({...player});
+    }));
+    console.log(`setupPlayers succeeded.`)
+  } catch (error) {
+    console.error(`setupPlayers failed, error: ${error}`);
+  }
+}
+
+const setupUsers = async () => {
+  console.log("setupUsers began.");
+  try {
+    await Promise.all([testData.user1, testData.user2].map(async (u) => {
+      return db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(u.address)
+        .create({address: u.address});
+    }));
+    console.log(`setupUsers succeeded.`)
+  } catch (error) {
+    console.error(`setupUsers failed, error: ${error}`);
   }
 }
 
@@ -78,6 +111,8 @@ const runTestDataSetup = async () => {
   console.log("--- BEGINNING DATA SETUP ---");
   await setupGoerli();
   await setupCollections();
+  await setupPlayers();
+  await setupUsers();
   await setupFighters();
   await setupSeason();
   console.log("--- END DATA SETUP ---\n\n");
