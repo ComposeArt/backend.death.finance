@@ -329,7 +329,7 @@ export const getPerFighterMatchStats = (
 
   const p1MatchStats: IFighterMatchStats = {
     fighterId: p1Stats.id,
-    won: winner === 0,
+    won: winner === '0',
     knockedOutOpponent: p1KnockedOutP2,
     perfectedOpponent: bouts.length === 2 && p2Stats.health === 0,
     uninjured: p1StartingHealth === p1Stats.health,
@@ -346,7 +346,7 @@ export const getPerFighterMatchStats = (
 
   const p2MatchStats: IFighterMatchStats = {
     fighterId: p2Stats.id,
-    won: winner === 1,
+    won: winner === '1',
     knockedOutOpponent: p2KnockedOutP1,
     perfectedOpponent: bouts.length === 2 && p1Stats.health === 0,
     uninjured: p2StartingHealth === p2Stats.health,
