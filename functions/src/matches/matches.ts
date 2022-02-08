@@ -38,6 +38,7 @@ export interface ICumulativeStats {
 export const totalStatsForMatches = (fighterId: string, matches: any[]): ICumulativeStats => {
   return matches.reduce((cumulativeStats, currentMatchStats) => {
     return {
+      matches: matches.length,
       won: cumulativeStats.won + currentMatchStats.won,
       knockedOutOpponent: cumulativeStats.knockedOutOpponent + currentMatchStats.knockedOutOpponent,
       perfectedOpponent: cumulativeStats.perfectedOpponent + currentMatchStats.perfectedOpponent,
