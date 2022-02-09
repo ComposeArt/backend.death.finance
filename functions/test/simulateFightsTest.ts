@@ -25,7 +25,7 @@ const registerFighterFxn = async () => {
     token_id: testData.player1.tokenId,
     playerId: testData.player1.id
   }).catch((error) => {
-    console.log("registerFighterFxn failed, received error %s", getErrorMessage(error));
+    console.error("registerFighterFxn failed, received error %s", getErrorMessage(error));
   });
   console.log("registerFighterFxn succeeded.");
 };
@@ -39,7 +39,7 @@ const registerAnotherFighterFxn = async () => {
     token_id: testData.player2.tokenId,
     playerId: testData.player2.id
   }).catch((error) => {
-    console.log("registerAnotherFighterFxn failed, received error %s", getErrorMessage(error));
+    console.error("registerAnotherFighterFxn failed, received error %s", getErrorMessage(error));
   });
   console.log("registerAnotherFighterFxn succeeded.");
 };
@@ -83,7 +83,7 @@ const simulateFightFxn = async () => {
 }
 
 const getErrorMessage = (error: unknown) => {
-  console.log(error);
+  console.error(error);
 
   if (error instanceof Error) {
     return error.message;
