@@ -29,28 +29,30 @@ export const updateCumulativeSeasonStats = async (seasonId: string, db: any) => 
 };
 
 export const updateFighterRankings = async (seasonId: string, db: any) => {
-  const fightersPath = db
+  const seasonPath = db
     .collection('nft-death-games')
-    .doc(seasonId)
-    .collection('fighters');
+    .doc(seasonId);
 
   try {
-    const allFighters = await fightersPath
-    .where('is_doping', '==', false)
-    .where('is_invalid', '==', false)
-    .where('statsDone', '==', true)
-    .get();
+    const allFighters = await seasonPath.collection('fighters')
+      .where('is_doping', '==', false)
+      .where('is_invalid', '==', false)
+      .where('statsDone', '==', true)
+      .get();
 
-    await Promise.all(allFighters
-      .map((fighter: any) => fighter.data())
-      .sort(compareFighters)
-      .map(async (fighter: any, index: number) => {
-        return await fightersPath
-          .doc(fighter.id)
-          .update({
-            ranking: index
-          });
-      }));
+    await Promise.all(
+      allFighters.docs
+        .map((fighter: any) => fighter.data())
+        .sort(compareFighters)
+        .map(async (fighter: any, index: number) => {
+          return await seasonPath
+          .collection('fighters')
+            .doc(fighter.id)
+            .update({
+              ranking: index
+            });
+        }));
+    await seasonPath.update({updateFighterRankings: false});
   } catch (error) {
     console.error(error);
     throw new Error(`updateFighterRankings failed ${error}`);

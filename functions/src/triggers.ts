@@ -419,8 +419,6 @@ export const updateFighterStats = async (db: any, fighter: any) => {
     .collection('matches')
     .where('statsDone', '==', true);
   try {
-    const matches: any = [];
-
     const fighter1Matches = await matchPath
       .where('fighter1', '==', fighter.id)
       .get();
@@ -429,15 +427,16 @@ export const updateFighterStats = async (db: any, fighter: any) => {
       .where('fighter2', '==', fighter.id)
       .get();
 
+    const stats: any = [];
     fighter1Matches.forEach((fighter1Match: any) => {
-      matches.push(fighter1Match.data().stats1);
+      stats.push(fighter1Match.data().stats1);
     });
 
     fighter2Matches.forEach((fighter2Match: any) => {
-      matches.push(fighter2Match.data().stats2);
+      stats.push(fighter2Match.data().stats2);
     });
 
-    const stats = matchesFunctions.totalStatsForMatches(matches);
+    const cumulativeStats = matchesFunctions.cumulativeStatsFromArray(stats);
 
     await db
       .collection('nft-death-games')
@@ -445,7 +444,7 @@ export const updateFighterStats = async (db: any, fighter: any) => {
       .collection('fighters')
       .doc(fighter.id)
       .update({
-        stats,
+        stats: cumulativeStats,
         updateStats: false,
         statsDone: true,
       });

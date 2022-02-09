@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, ICumulativeStats, totalStatsForMatches } from "../src/matches/matches";
+import { getPerFighterMatchStats, ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
 import * as testData from "./testData";
@@ -18,83 +18,6 @@ const functions = getFunctions(app);
 connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateFight = httpsCallable(functions, 'simulateFight');
 const registerFighter = httpsCallable(functions, 'registerFighter');
-
-const registerFighterFxn = async () => {
-  console.log("registerFighterFxn began.");
-  const _result = await registerFighter({
-    ownerAddress: '0xe2b9f0757a9e2813fae323aefd89ec8be706104a',
-    collection: 'flowtys',
-    contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
-    token_id: '7910',
-    playerId: 56020219
-  }).catch((error) => {
-    console.log("registerFighterFxn failed, received error %s", getErrorMessage(error));
-  });
-  console.log("registerFighterFxn succeeded.");
-};
-
-const registerAnotherFighterFxn = async () => {
-  console.log("registerAnotherFighterFxn began.");
-  const _result = await registerFighter({
-    ownerAddress: '0xf8a065f287d91d77cd626af38ffa220d9b552a2b',
-    collection: 'flowtys',
-    contract: '0x52607cb9c342821ea41ad265b9bb6a23bea49468',
-    token_id: '2413',
-    playerId: 56003240
-  }).catch((error) => {
-    console.log("registerAnotherFighterFxn failed, received error %s", getErrorMessage(error));
-  });
-  console.log("registerAnotherFighterFxn succeeded.");
-};
-
-const getErrorMessage = (error: unknown) => {
-  console.log(error);
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return '';
-};
-
-const simulateFightFxn = async () => {
-  try {
-    let response: any = await simulateFight({
-      isSimulated: true,
-      player1Id: testData.player1.id,
-      player1Collection: testData.player1.collection,
-      player2Id: testData.player2.id,
-      player2Collection: testData.player2.collection,
-      random: '1',
-      blockNumber: '11'
-    });
-    response = response.data;
-
-    let secondaryResponse: any = await simulateFight({
-      isSimulated: true,
-      player1Id: testData.player1.id,
-      player1Collection: testData.player1.collection,
-      player2Id: testData.player2.id,
-      player2Collection: testData.player2.collection,
-      random: response.randomness.toString(),
-      blockNumber: response.blockNumber.toString()
-    });
-
-    secondaryResponse = secondaryResponse.data;
-    console.log("eventLog replayable?: ", secondaryResponse.eventLog == response.eventLog);
-
-    let eventLog = response.eventLog;
-    const EVENT_SIZE = 9;
-    let isTie = (eventLog.length % EVENT_SIZE) == 1;
-    for (let i = 1; i < eventLog.length - 1; i += EVENT_SIZE) {
-      console.log(`${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P1 Attack:" : "P2 Attack:"} ${parseInt(eventLog.substring(i + 1, i + 5), 2)}, ${parseInt(eventLog.substring(i, i + 1), 2) == 0 ? "P2 Counter:" : "P1 Counter:"} ${parseInt(eventLog.substring(i + 5, i + EVENT_SIZE), 2)}`);
-    }
-    console.log(`${isTie ? "TIE!" : parseInt(eventLog.substring(eventLog.length - 1, eventLog.length), 2) == 0 ? "Fighter 1 Wins!" : "Fighter 2 Wins!"}`);
-  } catch (error) {
-    console.error(`simulateFightFxn failed: ${error}`);
-  }
-}
-
 const simulateMatchStatsFighter2Fucked = () => {
   // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
   console.log(`simulateMatchStatsPlayer2Fucked began.`);
@@ -202,12 +125,13 @@ const totalFighterStats = () => {
     }
   };
 
-  const result = totalStatsForMatches(id, [match1, match2]);
+  const result = cumulativeStatsFromArray([match1.stats1, match2.stats1]);
   console.log(`totalFighterStats results: ${JSON.stringify(result)}\n`);
 };
 
 const totalCollectionStats = () => {
   const fighter1Stats: ICumulativeStats = {
+    matches: 9,
     won: 7,
     knockedOutOpponent: 1,
     perfectedOpponent: 3,
@@ -224,6 +148,7 @@ const totalCollectionStats = () => {
   };
 
   const fighter2Stats: ICumulativeStats = {
+    matches: 9,
     won: 2,
     knockedOutOpponent: 11,
     perfectedOpponent: 3,
@@ -310,9 +235,6 @@ const rankFighters = () => {
 
 const runTests = async () => {
   console.log("--- BEGINNING MAINTEST ---");
-  await registerFighterFxn();
-  await registerAnotherFighterFxn();
-  await simulateFightFxn();
   await simulateMatchStatsFighter2Fucked();
   await simulateMatchStatsTieDyeOnTieDyeViolence();
   await totalFighterStats();
