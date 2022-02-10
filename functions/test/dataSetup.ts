@@ -111,6 +111,8 @@ const setupBufficornUsers = async () => {
       } else {
         console.log(`Already found have owner ${owner}`)
       }
+
+      // OpenSea blocks us if we send requests too often, so this is added. :(
       await delay(500);
     }
     console.log(`setupBufficornUsers succeeded.`)
