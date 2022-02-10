@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import * as admin from 'firebase-admin';
+import { allBufficornPlayers } from './data/bufficornPlayers';
 import * as testData from "./testData";
 
 admin.initializeApp({
@@ -11,14 +12,20 @@ let db = admin.firestore();
 const updateMatchStats = async () => {
   console.log("updateMatchStats began.");
   try {
-    const firstMatchId = `${testData.fighter1.id}-${testData.fighter2.id}`;
-    const secondMatchId = `${testData.fighter2.id}-${testData.fighter1.id}`;
-    await Promise.all([firstMatchId, secondMatchId].map(async (matchId) => {
+    const matchesSnap = await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .collection('matches')
+      .get()
+      console.log(`Got ${matchesSnap.size} matches.`)
+
+    await Promise.all(matchesSnap.docs.map(async (match) => {
+      console.log(`Setting simulate for match ID ${match.id}`)
       return db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('matches')
-        .doc(matchId)
+        .doc(match.id)
         .update({ simulate: true });
     }));
     console.log(`updateMatchStats succeeded.`)

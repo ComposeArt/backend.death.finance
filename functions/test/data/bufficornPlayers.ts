@@ -5,28 +5,10 @@ export const allBufficornPlayers = (): any[] => {
   }
   return players;
 }
-export const allBufficornFighters = (): any[] => {
-  return allBufficornPlayers().map((player) => {
-    return {
-      collection: player.collection,
-      id: player.id,
-      is_invalid: false,
-      is_doping: false,
-      owner: player.owner,
-      player: player,
-      statsDone: false
-    }
-  })
-}
-export const allBufficornUsers = (): any[] => {
-  let players = [];
-  for (let i = 0; i < 128; i++) {
-    players.push(allBufficorn[`bufficorn${i}`])
-  }
-  return players;
-}
 
-const allBufficorn: any = {
+export const bufficornContract = "0x1e988ba4692e52bc50b375bcc8585b95c48aad77"
+
+export const allBufficorn: any = {
   bufficorn0: {
     attack: 13,
     binary: '111011011101000100000010',
