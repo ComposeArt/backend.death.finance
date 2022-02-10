@@ -106,7 +106,7 @@ export const runFightsForBlock = async (
 
 export const scheduleBracket = async (
   db: any,
-  name: string,
+  bracketName: string,
   bestOfFights: number,
   matchups: any[],
   blockNumber: string,
@@ -116,12 +116,12 @@ export const scheduleBracket = async (
     const matchupId = `0-${index}`;
     try {
       await tournamentPath(db)
-        .doc(name)
+        .doc(bracketName)
         .collection('matches')
         .doc(matchupId)
         .create({
           best_of: bestOfFights,
-          bracket: name,
+          bracket: bracketName,
           fighter1: higher,
           fighter2: lower,
           rank1: higher.ranking,
@@ -130,16 +130,16 @@ export const scheduleBracket = async (
           startingBlock: blockNumber,
         });
 
-      console.log(`Scheduling ${name} bracket succeeded.`);
+      console.log(`Scheduling ${bracketName} bracket succeeded.`);
     } catch (error) {
-      console.error(`Creating tournament ${name} match between ${higher.id} and ${lower.id} failed: ${error}`);
+      console.error(`Creating tournament ${bracketName} match between ${higher.id} and ${lower.id} failed: ${error}`);
     }
 
     try {
-      await scheduleFightsForTournamentMatchup(db, higher, lower, name, bestOfFights, matchupId, blockNumber);
-      console.log(`Scheduling fights for matchup ${name} succeeded.`);
+      await scheduleFightsForTournamentMatchup(db, higher, lower, bracketName, bestOfFights, matchupId, blockNumber);
+      console.log(`Scheduling fights for matchup ${bracketName} succeeded.`);
     } catch (error) {
-      console.error(`Scheduling fights for ${name} match between ${higher.id} and ${lower.id} failed: ${error}`);
+      console.error(`Scheduling fights for ${bracketName} match between ${higher.id} and ${lower.id} failed: ${error}`);
     }
   }));
 };
