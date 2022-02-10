@@ -2,10 +2,10 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
+import { ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
-import * as testData from "./testData";
+import { getPerFighterMatchStats } from "../src/matches/matchesUtils";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -16,8 +16,6 @@ const app = initializeApp({
 
 const functions = getFunctions(app);
 connectFunctionsEmulator(functions, "localhost", 5001);
-const simulateFight = httpsCallable(functions, 'simulateFight');
-const registerFighter = httpsCallable(functions, 'registerFighter');
 const simulateMatchStatsFighter2Fucked = () => {
   // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
   console.log(`simulateMatchStatsPlayer2Fucked began.`);
