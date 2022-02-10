@@ -1,11 +1,6 @@
 import _ from 'lodash';
 import { getPerFighterMatchStats } from './matches/matchesUtils';
 
-// TODO: Will be used to make sure fights are scheduled on correct blocks.
-const isFightingBlock = (blockNumber: number): boolean => {
-  return _.floor(parseInt(blockNumber.toString(), 10) / 10 % 2) === 1;
-};
-
 /*
 -- Example 128 Fighter Bracket --
 Round of 64 (a, 32 matchups) - zeta   \
@@ -23,13 +18,18 @@ Round of 4 - sigma
 Round of 2 (final match) - omega
 */
 
+const isFightingBlock = (blockNumber: string): boolean => {
+  return _.floor(parseInt(blockNumber, 10) / 10 % 2) === 1;
+};
+
 export const scheduleTournamentForBlock = async (
   db: any,
   blockNumber: string
 ) => {
+  let block = increasedToNextFightingBlock(blockNumber);
   try {
-    await scheduleTournamentFirstRound(db, blockNumber);
-    await scheduleTournamentRemainingRounds(db, blockNumber);
+    await scheduleTournamentFirstRound(db, block);
+    await scheduleTournamentRemainingRounds(db, block);
   } catch (error) {
     console.error(`scheduleTournamentForBlock error ${error}`);
   }
@@ -144,6 +144,13 @@ export const scheduleBracket = async (
   }));
 };
 
+const increasedToNextFightingBlock = (block: string): string => {
+  if (!isFightingBlock(block)) {
+    return (parseInt(block, 10) + 10).toString()
+  }
+  return block
+}
+
 export const scheduleFightsForTournamentMatchup = async (
   db: any,
   f1: any,
@@ -156,13 +163,15 @@ export const scheduleFightsForTournamentMatchup = async (
   try {
     console.log(`scheduleFightsForTournamentMatchup with ${bestOf} rounds.`);
     for (let i = 0; i < bestOf; i++) {
+      let fightBlock = (parseInt(blockNumber, 10) + i).toString()
+      fightBlock = increasedToNextFightingBlock(fightBlock);
       await db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('fights')
-        .doc(`${bracketName}-${matchupId}`)
+        .doc(`${bracketName}-${matchupId}-${i}`)
         .create({
-          block: blockNumber + i,
+          block: fightBlock,
           bracket: bracketName,
           log: '',
           match_id: matchupId,
