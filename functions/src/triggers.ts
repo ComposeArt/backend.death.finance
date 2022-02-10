@@ -27,18 +27,20 @@ export const createFighter = async (snap: any, admin: any) => {
   const fighter = snap.data();
 
   try {
-    await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
-      updateImage: true,
-      updateMatches: true,
-    });
+    if (!fighter.is_invalid && !fighter.is_doping) {
+      await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
+        updateImage: true,
+        updateMatches: true,
+      });
 
-    await db.collection('nft-death-games').doc('season_0').collection('users').doc(fighter.owner).update({
-      updateProfileImage: true,
-    });
+      await db.collection('nft-death-games').doc('season_0').collection('users').doc(fighter.owner).update({
+        updateProfileImage: true,
+      });
 
-    await db.collection('nft-death-games').doc('season_0').collection('collections').doc(fighter.collection).update({
-      updateCollectionImage: true,
-    });
+      await db.collection('nft-death-games').doc('season_0').collection('collections').doc(fighter.collection).update({
+        updateCollectionImage: true,
+      });
+    }
   } catch (error) {
     console.error(error);
   }
