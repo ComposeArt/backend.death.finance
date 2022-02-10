@@ -84,7 +84,10 @@ export const connectDiscordUser = async (admin: any, { token, address }: any) =>
         .collection('users')
         .doc(address)
         .update({
-          discord,
+          discord: {
+            uid: discord.uid,
+            username: discord.username,
+          }
         });
     }
   } catch (error) {
