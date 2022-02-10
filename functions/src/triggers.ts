@@ -8,6 +8,7 @@ import * as simulateFunctions from './simulate';
 import * as matchesFunctions from './matches/matches';
 import * as collectionFunctions from './collection';
 import * as seasonFunctions from './season';
+import * as tournamentFunctions from './tournament';
 
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
@@ -501,6 +502,8 @@ export const updateBlock = async (change: any, admin: any) => {
             simulate: true,
           });
       }));
+
+      await tournamentFunctions.runFightsForBlock(db, newBlockNumber);
     } catch (error) {
       console.error(error);
     }
@@ -544,14 +547,38 @@ export const updateSeason = async (change: any, admin: any) => {
   }
 };
 
-const getErrorMessage = (error: unknown) => {
-  console.log(error);
+export const updateFight = async (change: any, admin: any) => {
+  const previous = change.before.data();
+  const updatedFight = change.after.data();
+  const db = admin.firestore();
 
-  if (error instanceof Error) {
-    return error.message;
+  try {
+    if (!previous.simulate && updatedFight.simulate) {
+      const result = await simulateFunctions.getFightSimulationResults({
+        db,
+        f1: updatedFight.player1,
+        f2: updatedFight.player2,
+        blockNumber: updatedFight.block,
+      });
+      await db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('fights')
+        .doc(updatedFight.id)
+        .update({
+          log: result.eventLog,
+          randomness: result.randomness,
+          updateStats: true,
+          simulate: false,
+        });
+    }
+
+    if (!previous.updateStats && updatedFight.updateStats) {
+      await tournamentFunctions.updateFighterStatsForFight(db, updatedFight);
+    }
+  } catch (error) {
+    console.error(error);
   }
-
-  return '';
 };
 
 const logFighterRegistrationToDiscord = async (db: any, fighter: any) => {

@@ -66,6 +66,10 @@ export const onUpdateUser = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/users/{userId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateUser(change, admin));
 
+export const onUpdateFight = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/fights/{fightId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateFight(change, admin));
+
 // ------------------ //
 //      CALLABLE      //
 // ------------------ //
