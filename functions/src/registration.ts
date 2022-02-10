@@ -307,7 +307,6 @@ export const schedulePreSeasonMatches = async (
   db: any,
   fighter: any,
 ) => {
-  console.log(`schedulePreSeasonMatches for fighter: ${fighter.id}.`);
   const allFighterSnapshot = await db.collection('nft-death-games')
     .doc('season_0')
     .collection('fighters')
