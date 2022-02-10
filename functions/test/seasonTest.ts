@@ -13,7 +13,10 @@ const setupSeason = async () => {
     .collection('nft-death-games')
     .doc('season_0');
   try {
-    await path.create({id: 'season_0'});
+    await path.create({
+      id: 'season_0',
+      updateFighterRankings: false
+    });
     await path.update({
       updateFighterRankings: true
     });

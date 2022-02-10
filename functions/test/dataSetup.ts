@@ -7,7 +7,7 @@ import * as functions from 'firebase-functions';
 import fetch from 'node-fetch';
 
 function delay(d: any) {
-  return new Promise ((fulfill) => {
+  return new Promise((fulfill) => {
     setTimeout(fulfill, d);
   });
 }
@@ -42,7 +42,7 @@ const setupCollections = async () => {
         .doc('season_0')
         .collection('collections')
         .doc(player.collection)
-        .create({id: player.collection});
+        .create({ id: player.collection });
     }));
     console.log(`setupCollections succeeded.`)
   } catch (error) {
@@ -60,7 +60,7 @@ const setupPlayers = async () => {
         .doc(player.collection)
         .collection('players')
         .doc(player.id)
-        .create({...player});
+        .create({ ...player });
     }));
     console.log(`setupPlayers succeeded.`)
   } catch (error) {

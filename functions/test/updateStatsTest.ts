@@ -17,8 +17,7 @@ const updateMatchStats = async () => {
       .doc('season_0')
       .collection('matches')
       .get()
-      console.log(`Got ${matchesSnap.size} matches.`)
-
+    console.log(`updateMatchStats got ${matchesSnap.size} matches.`)
     await Promise.all(matchesSnap.docs.map(async (match) => {
       console.log(`Setting simulate for match ID ${match.id}`)
       return db
