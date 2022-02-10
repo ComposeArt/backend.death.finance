@@ -1,5 +1,8 @@
 import _ from 'lodash';
 import nodeHtmlToImage from 'node-html-to-image';
+import { ethers } from 'ethers';
+
+import FightClub from './FightClub.json';
 import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
 import * as matchesFunctions from './matches/matches';
@@ -112,9 +115,25 @@ export const updateUser = async (change: any, admin: any) => {
     if (!oldUser.updateProfileImage && user.updateProfileImage) {
       await updateProfileImage(db, storage, user);
     }
+
+    if (!oldUser.updateChaos && user.updateChaos) {
+      await updateChaos(db, user);
+    }
   } catch (error) {
     console.error(error);
   }
+};
+
+const updateChaos = async (db: any, user: any) => {
+  const fightClub = await simulateFunctions.getFightClubContract(db);
+  const chaosAdded = (await fightClub.getUserRandomness(user.address)).toString() || '0';
+
+  console.log(chaosAdded);
+
+  await db.collection('nft-death-games').doc('season_0').collection('users').doc(user.address).update({
+    chaos: parseInt(chaosAdded, 10),
+    updateChaos: false,
+  });
 };
 
 const updateProfileImage = async (db: any, storage: any, user: any) => {

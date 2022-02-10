@@ -22,6 +22,10 @@ export const updateCollectionStats = firebaseFunction.pubsub
   .schedule('every 1 hours')
   .onRun(async () => scheduleFunctions.updateCollectionStats(admin));
 
+export const updateChaosAdded = firebaseFunction.pubsub
+  .schedule('every 1 hours')
+  .onRun(async () => scheduleFunctions.updateChaosAdded(admin));
+
 // ------------------ //
 //      TRIGGERS      //
 // ------------------ //
@@ -61,6 +65,12 @@ export const onUpdateUser = firebaseFunction.firestore
 // ------------------ //
 //      CALLABLE      //
 // ------------------ //
+
+export const createUser = firebaseFunction.https
+  .onCall((params, context) => registrationFunctions.createUser(admin, params));
+
+export const connectDiscordUser = firebaseFunction.https
+  .onCall((params, context) => registrationFunctions.connectDiscordUser(admin, params));
 
 export const simulateFight = firebaseFunction.https
   .onCall((params, context) => simulateFunctions.simulateFight(admin, params));

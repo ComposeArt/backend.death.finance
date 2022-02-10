@@ -30,6 +30,69 @@ const getAssets = async ({
   }
 };
 
+export const createUser = async (admin: any, { address }: any) => {
+  const db = admin.firestore();
+
+  try {
+    const userDoc = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('users')
+      .doc(address)
+      .get();
+
+    if (!userDoc.exists) {
+      await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(address)
+        .set({
+          address,
+          registered: 0,
+          chaos: 0,
+          highest_placement: 0,
+        });
+    }
+  } catch (error) {
+    const msg = getErrorMessage(error);
+    throw new functions.https.HttpsError('internal', msg || 'failed to save address');
+  }
+};
+
+export const connectDiscordUser = async (admin: any, { token, address }: any) => {
+  const db = admin.firestore();
+
+  try {
+    const userDoc = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('users')
+      .doc(address)
+      .get();
+
+    const discordDocs = await db.collection('users')
+      .where('token', '==', token)
+      .get();
+
+    let discord: any = {};
+
+    discordDocs.forEach((discordDoc: any) => {
+      discord = discordDoc.data();
+    });
+
+    if (userDoc.exists && !_.isEmpty(discord)) {
+      await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(address)
+        .update({
+          discord,
+        });
+    }
+  } catch (error) {
+    const msg = getErrorMessage(error);
+    throw new functions.https.HttpsError('internal', msg || 'failed to connect');
+  }
+};
+
 export const getAddressNFTs = async (admin: any, { ownerAddress }: any, context: any) => {
   const db = admin.firestore();
 
@@ -121,18 +184,41 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
     }
 
     const isOwner = owner === openSeaData.owner.address;
+    const username = _.get(openSeaData, 'owner.user.username', '');
+
     if (!isOwner) {
       throw new Error('not the owner');
     }
 
-    // Make owner document
-    await db.collection('nft-death-games')
+    const userDoc = await db.collection('nft-death-games')
       .doc('season_0')
       .collection('users')
       .doc(owner)
-      .set({
-        address: owner,
-      }, { merge: true });
+      .get();
+
+    if (userDoc.exists) {
+      const user = userDoc.data();
+
+      await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(owner)
+        .update({
+          address: owner,
+          registered: user.registered + 1,
+          username,
+        });
+    } else {
+      await db.collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(owner)
+        .set({
+          address: owner,
+          registered: 1,
+          username,
+        });
+    }
 
     const existingFighter = await fightersRef
       .doc(String(playerId))

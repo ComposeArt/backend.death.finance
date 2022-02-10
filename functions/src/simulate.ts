@@ -7,7 +7,7 @@ import * as functions from 'firebase-functions';
 import nodeHtmlToImage from 'node-html-to-image';
 import FightClub from './FightClub.json';
 
-const getFightClubContract = async (db: any) => {
+export const getFightClubContract = async (db: any) => {
   const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
   const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
   const signer = wallet.connect(infuraProvider);

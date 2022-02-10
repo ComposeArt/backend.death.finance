@@ -72,3 +72,31 @@ export const updateCollectionStats = async (admin: any) => {
     console.error(error);
   }
 };
+
+export const updateChaosAdded = async (admin: any) => {
+  try {
+    const db = admin.firestore();
+
+    const userDocs = await db.collection('nft-death-games')
+      .doc('season_0')
+      .collection('users')
+      .get();
+
+    const users: any = [];
+
+    userDocs.forEach((userDoc: any) => users.push(userDoc.id));
+
+    await Promise.all(users.map(async (id: string) => {
+      await db
+        .collection('nft-death-games')
+        .doc('season_0')
+        .collection('users')
+        .doc(id)
+        .update({
+          updateChaos: true,
+        });
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+};
