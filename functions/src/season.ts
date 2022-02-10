@@ -63,25 +63,52 @@ export const compareFighters = (fighter1: any, fighter2: any) => {
   const stats1 = fighter1.stats;
   const stats2 = fighter2.stats;
 
-  const wins = stats1.won > stats2.won;
-  const kos = stats1.knockedOutOpponent > stats2.knockedOutOpponent;
-  const perfects = stats1.perfectedOpponent > stats2.perfectedOpponent;
-
-  // If the lower power fighter has the same # of wins, kos and perfects,
-  // they have heart. Rank them higher.
-  const power = fighter1.player.power < fighter2.player.power;
-
-  const dmgDealt = stats1.damageDealt > stats2.damageDealt;
-  const dmgReceived = stats1.damageReceived < stats2.damageReceived;
-
-  if (
-    wins ||
-    kos ||
-    perfects ||
-    power ||
-    dmgDealt ||
-    dmgReceived) {
+  if (stats1.won > stats2.won) {
     return -1;
+  }
+
+  if (stats1.won < stats2.won) {
+    return 1;
+  }
+
+  if (stats1.knockedOutOpponent > stats2.knockedOutOpponent) {
+    return -1;
+  }
+
+  if (stats1.knockedOutOpponent < stats2.knockedOutOpponent) {
+    return 1;
+  }
+
+  if (stats1.perfectedOpponent > stats2.perfectedOpponent) {
+    return -1;
+  }
+
+  if (stats1.perfectedOpponent < stats2.perfectedOpponent) {
+    return 1;
+  }
+
+  if (fighter1.player.power < fighter2.player.power) {
+    return -1;
+  }
+
+  if (fighter1.player.power > fighter2.player.power) {
+    return 1;
+  }
+
+  if (stats1.damageDealt > stats2.damageDealt) {
+    return -1;
+  }
+
+  if (stats1.damageDealt < stats2.damageDealt) {
+    return 1;
+  }
+
+  if (stats1.damageReceived < stats2.damageReceived) {
+    return -1;
+  }
+
+  if (stats1.damageReceived > stats2.damageReceived) {
+    return 1;
   }
 
   return 0;
