@@ -1,4 +1,4 @@
-import { IFighterMatchStats } from './matches'
+import { IFighterMatchStats } from './matches';
 import _ from 'lodash';
 
 export const elementStrengths: any = {

@@ -48,6 +48,7 @@ export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any
     const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 10) });
     const eventLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
 
+    console.log(`getFightSimulationResults succeeded for fighters ${f1.id} and ${f2.id}.`);
     return {
       eventLog: BigInt((eventLog).toString().replace('.', '')).toString(2),
       randomness: randomness.toString(),
@@ -104,6 +105,7 @@ export const simulateFight = async (
       .doc(player2Id)
       .get();
 
+    console.log(`Simulating ${player1Id} of ${player1Collection} with ${player2Id} of ${player2Collection}.`);
     if (player1Doc.exists && player2Doc.exists) {
       const player1 = player1Doc.data();
       const player2 = player2Doc.data();

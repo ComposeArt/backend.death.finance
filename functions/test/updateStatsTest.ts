@@ -51,12 +51,12 @@ function delay(d: any) {
 }
 
 const runTestDataSetup = async () => {
-  console.log("--- BEGINNING DATA SETUP ---");
+  console.log("--- BEGINNING UPDATESTATS ---");
   await updateMatchStats();
 
   // Needed so the triggers in updateMatchStats can complete.
   await delay(5000);
   await updateFighterStats();
-  console.log("--- END DATA SETUP ---\n\n");
+  console.log("--- END UPDATESTATS ---\n\n");
 }
 runTestDataSetup();

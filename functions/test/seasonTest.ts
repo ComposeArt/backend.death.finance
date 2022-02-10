@@ -23,10 +23,9 @@ const setupSeason = async () => {
   }
 }
 
-
 const runTestDataSetup = async () => {
-  console.log("--- BEGINNING DATA SETUP ---");
+  console.log("--- BEGINNING SEASON TEST ---");
   await setupSeason();
-  console.log("--- END DATA SETUP ---\n\n");
+  console.log("--- END SEASON TEST ---\n\n");
 }
 runTestDataSetup();
