@@ -87,6 +87,7 @@ export const connectDiscordUser = async (admin: any, { token, address }: any) =>
           discord: {
             uid: discord.uid,
             username: discord.username,
+            discriminator: discord.discriminator,
           }
         });
     }
