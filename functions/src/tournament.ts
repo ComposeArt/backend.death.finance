@@ -50,15 +50,25 @@ export const scheduleTournamentFirstBrackets = async (
   const fighters = await getAllFightersRankedOrder(db);
   const [firstHalf, secondHalf] = inHalf(fighters);
   const paired = zip(firstHalf, secondHalf);
-  const [zeta, theta] = inHalf(paired);
+
+  const zeta: any[] = [];
+  const theta: any[] = [];
+
+  paired.forEach((matchup, index) => {
+    if (index % 2 === 0) {
+      zeta.push(matchup);
+    } else {
+      theta.push(matchup);
+    }
+  });
 
   scheduleBracket(db, 'zeta', 3, zeta, blockNumber);
-  scheduleEmptyBracket(db, 'zeta', 3, zeta.size / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
-  scheduleEmptyBracket(db, 'zeta', 3, zeta.size / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
 
   scheduleBracket(db, 'theta', 3, theta, blockNumber);
-  scheduleEmptyBracket(db, 'theta', 3, theta.size / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
-  scheduleEmptyBracket(db, 'theta', 3, theta.size / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
+  scheduleEmptyBracket(db, 'theta', 3, theta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
+  scheduleEmptyBracket(db, 'theta', 3, theta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
 };
 
 export const scheduleTournamentFinalistBrackets = async (
