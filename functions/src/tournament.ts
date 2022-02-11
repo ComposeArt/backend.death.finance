@@ -26,16 +26,24 @@ export const scheduleTournamentForBlock = async (
   db: any,
   blockNumber: string
 ) => {
-  let block = increasedToNextFightingBlock(blockNumber);
+  const block = increasedToNextFightingBlock(blockNumber);
   try {
-    await scheduleTournamentFirstRound(db, block);
-    await scheduleTournamentRemainingRounds(db, block);
+    await scheduleTournamentFirstBrackets(db, block);
+    await scheduleTournamentFinalistBrackets(db, block);
   } catch (error) {
     console.error(`scheduleTournamentForBlock error ${error}`);
   }
 };
 
-export const scheduleTournamentFirstRound = async (
+const addedNumberToBlock = (blockNumber: string, numberToAdd: number): string => {
+  return (parseInt(blockNumber, 10) + numberToAdd).toString();
+};
+/*
+There are ~6500 blocks every day. We want about 2 hours between rounds, which is 270 blocks.
+*/
+const twoHoursOfBlocks = 270;
+
+export const scheduleTournamentFirstBrackets = async (
   db: any,
   blockNumber: string,
 ) => {
@@ -43,17 +51,31 @@ export const scheduleTournamentFirstRound = async (
   const [firstHalf, secondHalf] = inHalf(fighters);
   const paired = zip(firstHalf, secondHalf);
   const [zeta, theta] = inHalf(paired);
-  // TODO: The zeta bracket has much more disparity than the theta bracket. Need to fix.
-  // TODO: Fights should only be scheduled on fighting blocks.
+
   scheduleBracket(db, 'zeta', 3, zeta, blockNumber);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.size / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.size / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
+
   scheduleBracket(db, 'theta', 3, theta, blockNumber);
+  scheduleEmptyBracket(db, 'theta', 3, theta.size / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
+  scheduleEmptyBracket(db, 'theta', 3, theta.size / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
 };
 
-export const scheduleTournamentRemainingRounds = async (
+export const scheduleTournamentFinalistBrackets = async (
   db: any,
-  blockNumber: string,
+  firstRoundBlockStart: string,
 ) => {
-  // TODO fill in upcoming rounds, but with no fighters
+  /*
+  We want our finalist rounds, sigma and omega, to start the following day at approximately the same time.
+  */
+  const sigmaStart = addedNumberToBlock(firstRoundBlockStart, 6500);
+  const sigmaSize = 16;
+
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, sigmaStart, 0);
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks), 1);
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 2), 2);
+
+  scheduleEmptyBracket(db, 'omega', 7, 1, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 3), 0);
 };
 
 const zip = (left: any[], right: any[]): any[] => {
@@ -104,6 +126,42 @@ export const runFightsForBlock = async (
   }
 };
 
+export const scheduleEmptyBracket = async (
+  db: any,
+  bracketName: string,
+  bestOfFights: number,
+  matchupCount: number,
+  blockNumber: string,
+  roundNumber: number,
+) => {
+  for (let i = 0; i < matchupCount; i++) {
+    const matchupId = `${roundNumber}-${i}`;
+    try {
+      await tournamentPath(db)
+        .doc(bracketName)
+        .collection('matches')
+        .doc(matchupId)
+        .create({
+          best_of: bestOfFights,
+          bracket: bracketName,
+          round: roundNumber,
+          startingBlock: blockNumber,
+        });
+
+      console.log(`Scheduled empty bracket ${bracketName} round ${roundNumber} bracket succeeded.`);
+    } catch (error) {
+      console.error(`Scheduling empty bracket ${bracketName} round ${roundNumber} failed: ${error}`);
+    }
+
+    try {
+      await scheduleFightsForTournamentMatchup(db, bracketName, bestOfFights, matchupId, blockNumber);
+      console.log(`Scheduling fights for matchup ${bracketName} succeeded.`);
+    } catch (error) {
+      console.error(`Scheduling empty fights for ${bracketName} round ${roundNumber} failed: ${error}`);
+    }
+  }
+};
+
 export const scheduleBracket = async (
   db: any,
   bracketName: string,
@@ -136,7 +194,7 @@ export const scheduleBracket = async (
     }
 
     try {
-      await scheduleFightsForTournamentMatchup(db, higher, lower, bracketName, bestOfFights, matchupId, blockNumber);
+      await scheduleFightsForTournamentMatchup(db, bracketName, bestOfFights, matchupId, blockNumber, higher, lower);
       console.log(`Scheduling fights for matchup ${bracketName} succeeded.`);
     } catch (error) {
       console.error(`Scheduling fights for ${bracketName} match between ${higher.id} and ${lower.id} failed: ${error}`);
@@ -146,39 +204,45 @@ export const scheduleBracket = async (
 
 const increasedToNextFightingBlock = (block: string): string => {
   if (!isFightingBlock(block)) {
-    return (parseInt(block, 10) + 10).toString()
+    return addedNumberToBlock(block, 10).toString();
   }
-  return block
-}
+  return block;
+};
 
 export const scheduleFightsForTournamentMatchup = async (
   db: any,
-  f1: any,
-  f2: any,
   bracketName: string,
   bestOf: number,
   matchupId: string,
   blockNumber: string,
+  f1?: any,
+  f2?: any,
 ) => {
   try {
     console.log(`scheduleFightsForTournamentMatchup with ${bestOf} rounds.`);
     for (let i = 0; i < bestOf; i++) {
-      let fightBlock = (parseInt(blockNumber, 10) + i).toString()
+      let fightBlock = addedNumberToBlock(blockNumber, i).toString();
       fightBlock = increasedToNextFightingBlock(fightBlock);
+
+      const fight: any = {
+        block: fightBlock,
+        bracket: bracketName,
+        log: '',
+        match_id: matchupId,
+        randomness: '',
+      };
+
+      if (f1 != null && f2 != null) {
+        fight.f1 = f1;
+        fight.f2 = f2;
+      }
+
       await db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('fights')
         .doc(`${bracketName}-${matchupId}-${i}`)
-        .create({
-          block: fightBlock,
-          bracket: bracketName,
-          log: '',
-          match_id: matchupId,
-          randomness: '',
-          fighter1: f1,
-          fighter2: f2
-        });
+        .create(fight);
     }
   } catch (error) {
     console.error(`scheduleFightsForTournamentMatchup error ${error}`);
