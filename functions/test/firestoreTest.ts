@@ -12,17 +12,17 @@ const getFightSimulation = async () => {
   console.log("getFightSimulation began.");
   const _result = await getFightSimulationResults({
     db,
-    f1: {
+    p1: {
       collection: 'minitaurs-reborn',
       id: '182521675',
       binary_power: 16498618
     },
-    f2: {
+    p2: {
       collection: 'galaktic-gang',
       id: '150340670',
       binary_power: 16498619
     },
-    blockNumber: '6345212'
+    blockNumber: '6361936'
   }).catch((error) => {
     console.error("getFightSimulation failed with error: %s", error);
   });

@@ -42,11 +42,12 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
   return matches;
 };
 
-export const getFightSimulationResults = async ({ db, f1, f2, blockNumber }: any) => {
+export const getFightSimulationResults = async ({ db, p1, p2, blockNumber }: any) => {
   const fightClub = await getFightClubContract(db);
   try {
+
     const randomness = await fightClub.getRandomness({ blockTag: parseInt(blockNumber, 10) });
-    const eventLog = await fightClub.fight(true, f1.binary_power, f2.binary_power, randomness, blockNumber);
+    const eventLog = await fightClub.fight(true, p1.binary_power, p2.binary_power, randomness.toString(), blockNumber);
 
     return {
       eventLog: BigInt((eventLog).toString().replace('.', '')).toString(2),
