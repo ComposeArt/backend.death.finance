@@ -126,11 +126,20 @@ export const runFightsForBlock = async (
   blockNumber: string,
 ) => {
   try {
-    await fightsPath(db)
+    const fights = await fightsPath(db)
       .where('block', '==', blockNumber)
-      .update({
-        simulate: true
-      });
+      .get();
+    Promise.all(fights
+      .docs
+      .map((f: any) => f.data())
+      .map(async (fight: any) => {
+        console.log(`HMM ${fight.id}`);
+        return fightsPath(db)
+          .doc(fight.id)
+          .update({
+            simulate: true
+          });
+      }));
   } catch (error) {
     console.error(`runFightsForBlock error: ${error}`);
   }
@@ -234,9 +243,11 @@ export const scheduleFightsForTournamentMatchup = async (
       let fightBlock = addedNumberToBlock(blockNumber, i).toString();
       fightBlock = increasedToNextFightingBlock(fightBlock);
 
+      const id = `${bracketName}-${matchupId}-${i}`;
       const fight: any = {
         block: fightBlock,
         bracket: bracketName,
+        id,
         log: '',
         match_id: matchupId,
         randomness: '',
@@ -247,11 +258,13 @@ export const scheduleFightsForTournamentMatchup = async (
         fight.f2 = f2;
       }
 
+      fight.isFinalFight = i === (bestOf - 1);
+
       await db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('fights')
-        .doc(`${bracketName}-${matchupId}-${i}`)
+        .doc(id)
         .create(fight);
     }
   } catch (error) {
@@ -263,7 +276,7 @@ export const updateFighterStatsForFight = async (
   db: any,
   fight: any
 ) => {
-  const results = getPerFighterMatchStats(fight.log, fight.player1, fight.player2);
+  const results = getPerFighterMatchStats(fight.log, fight.f1.player, fight.f2.player);
   await db
     .collection('nft-death-games')
     .doc('season_0')
@@ -276,12 +289,12 @@ export const updateFighterStatsForFight = async (
       statsDone: true,
     });
 
-  await [fight.fighter1, fight.fighter2].forEach(async (fighter) => {
+  [fight.f1, fight.f2].forEach(async (fighter) => {
     await db
       .collection('nft-death-games')
       .doc('season_0')
       .collection('fighters')
-      .doc(fighter)
+      .doc(fighter.id)
       .update({
         updateStats: true,
       });
