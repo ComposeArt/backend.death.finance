@@ -127,6 +127,14 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
   const db = admin.firestore();
 
   try {
+    const season = await db.collection('nft-death-games')
+      .doc('season_0')
+      .get();
+
+    if (season.registrationClosed) {
+      throw new Error(`Registration is currently closed; tournament starts soon.`);
+    }
+
     console.log(`On OpenSea, fetching contract ${contract} and token ${token_id}.`);
     const openSeaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
       headers: {

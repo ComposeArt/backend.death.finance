@@ -15,7 +15,8 @@ const setupSeason = async () => {
   try {
     await path.create({
       id: 'season_0',
-      updateFighterRankings: false
+      updateFighterRankings: false,
+      registrationClosed: false,
     });
     await path.update({
       updateFighterRankings: true
