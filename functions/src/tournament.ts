@@ -163,7 +163,10 @@ export const scheduleEmptyBracket = async (
         .create({
           best_of: bestOfFights,
           bracket: bracketName,
+          fighter1FightWins: 0,
+          fighter2FightWins: 0,
           round: roundNumber,
+          slot: i,
           startingBlock: blockNumber,
         });
 
@@ -201,9 +204,12 @@ export const scheduleBracket = async (
           bracket: bracketName,
           fighter1: higher,
           fighter2: lower,
+          fighter1FightWins: 0,
+          fighter2FightWins: 0,
           rank1: higher.ranking,
           rank2: lower.ranking,
           round: 0,
+          slot: index,
           startingBlock: blockNumber,
         });
 
@@ -234,8 +240,8 @@ export const scheduleFightsForTournamentMatchup = async (
   bestOf: number,
   matchupId: string,
   blockNumber: string,
-  f1?: any,
-  f2?: any,
+  fighter1?: any,
+  fighter2?: any,
 ) => {
   try {
     console.log(`scheduleFightsForTournamentMatchup with ${bestOf} rounds.`);
@@ -253,9 +259,9 @@ export const scheduleFightsForTournamentMatchup = async (
         randomness: '',
       };
 
-      if (f1 != null && f2 != null) {
-        fight.f1 = f1;
-        fight.f2 = f2;
+      if (fighter1 != null && fighter2 != null) {
+        fight.fighter1 = fighter1;
+        fight.fighter2 = fighter2;
       }
 
       fight.isFinalFight = i === (bestOf - 1);
@@ -272,31 +278,86 @@ export const scheduleFightsForTournamentMatchup = async (
   }
 };
 
-export const updateFighterStatsForFight = async (
+const seasonPath = (db: any) => {
+  return db.collection('nft-death-games').doc('season_0');
+};
+
+export const updateStatsForFightResult = async (
   db: any,
   fight: any
 ) => {
-  const results = getPerFighterMatchStats(fight.log, fight.f1.player, fight.f2.player);
-  await db
-    .collection('nft-death-games')
-    .doc('season_0')
-    .collection('fights')
-    .doc(fight.id)
-    .update({
-      stats1: results.stats1,
-      stats2: results.stats2,
-      updateStats: false,
-      statsDone: true,
+  const { stats1, stats2 } = getPerFighterMatchStats(fight.log, fight.fighter1.player, fight.fighter2.player);
+  try {
+    await seasonPath(db)
+      .collection('fights')
+      .doc(fight.id)
+      .update({
+        stats1,
+        stats2,
+        updateStats: false,
+        statsDone: true,
+      });
+
+    [fight.fighter1, fight.fighter2].forEach(async (fighter) => {
+      await seasonPath(db)
+        .collection('fighters')
+        .doc(fighter.id)
+        .update({
+          updateStats: true,
+        });
     });
 
-  [fight.f1, fight.f2].forEach(async (fighter) => {
-    await db
-      .collection('nft-death-games')
-      .doc('season_0')
-      .collection('fighters')
-      .doc(fighter.id)
-      .update({
-        updateStats: true,
-      });
-  });
+    const matchPath = seasonPath(db).collection('tournament').doc(fight.bracket).collection('matches').doc(fight.match_id);
+
+    const snap = await matchPath.get();
+    const match = snap.data();
+
+    const newFighter1Wins = match.fighter1FightWins + (stats1.won ? 1 : 0);
+    const newFighter2Wins = match.fighter2FightWins + (stats2.won ? 1 : 0);
+    await matchPath.update({
+      fighter1FightWins: newFighter1Wins,
+      fighter2FightWins: newFighter2Wins
+    });
+
+    if (fight.isFinalFight) {
+      const fighter1WonMatch = newFighter1Wins > newFighter2Wins;
+      moveFighterToNextRound(db, fighter1WonMatch ? match.fighter1 : match.fighter2, match);
+    }
+  } catch (error) {
+    console.error(`updateStatsForFightResult error ${error}`);
+  }
+};
+
+const moveFighterToNextRound = async (db: any, fighter: any, matchFighterWon: any) => {
+  const nextRound = matchFighterWon.round + 1;
+  const nextSlot = Math.floor(matchFighterWon.slot / 2);
+
+  const matchPath = seasonPath(db)
+    .collection('tournament')
+    .doc(matchFighterWon.bracket)
+    .collection('matches')
+    .doc(`${nextRound}-${nextSlot}`);
+
+  /* We retain above/below ordering for visual continuity in a bracket. For example:
+  a _
+     \
+      b
+  b _/
+
+  c _
+     \
+      d
+  d _/
+  For the next round, we always want the winner of c-d to be slotted into player2, and winner of a-b into player1.
+  */
+  const wasUpperSlot = matchFighterWon.slot % 2 === 0;
+  if (wasUpperSlot) {
+    await matchPath.update({
+      fighter1: fighter
+    });
+  } else {
+    await matchPath.update({
+      fighter2: fighter
+    });
+  }
 };

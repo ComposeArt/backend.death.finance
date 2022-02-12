@@ -8,10 +8,27 @@ admin.initializeApp({
 });
 let db = admin.firestore();
 
+// We run this again in case some of the ranking updates didn't get a chance
+// to run due to the quick nature of the tests.
+const reUpdateFighterRankings = async () => {
+  console.log("reUpdateFighterRankings began.");
+  try {
+    await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .update({
+        updateFighterRankings: true
+      });
+    console.log("reUpdateFighterRankings succeeded.");
+  } catch (error) {
+    console.error(`reUpdateFighterRankings failed, error: ${error}`);
+  }
+};
+
 const setupTournament = async () => {
   console.log("setupTournament began.");
   try {
-    await scheduleTournamentForBlock(db, "65550");
+    await scheduleTournamentForBlock(db, "6361641");
     console.log("setupTournament succeeded.");
   } catch (error) {
     console.error(`setupTournament failed, error: ${error}`);
@@ -20,6 +37,7 @@ const setupTournament = async () => {
 
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING TOURNAMENT TEST ---");
+  await reUpdateFighterRankings();
   await setupTournament();
   console.log("--- END TOURNAMENT TEST ---\n\n");
 }

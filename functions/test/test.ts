@@ -51,7 +51,7 @@ const simulateMatchStatsFighter2Fucked = () => {
 const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence began.`);
-  const f1 = {
+  const fighter1 = {
     attack: 6,
     defense: 10,
     element: 6,
@@ -62,7 +62,7 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
     special_element: 10,
   }
 
-  const f2 = {
+  const fighter2 = {
     attack: 14,
     defense: 15,
     element: 3,
@@ -75,8 +75,8 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
 
   const result = getPerFighterMatchStats(
     "10011100001101000000011000001000000100101000001100001000101000001110011000010000001010101001",
-    f1,
-    f2);
+    fighter1,
+    fighter2);
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}\n`);
 };
 

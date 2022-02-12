@@ -556,8 +556,8 @@ export const updateFight = async (change: any, admin: any) => {
     if (!previous.simulate && updatedFight.simulate) {
       const result = await simulateFunctions.getFightSimulationResults({
         db,
-        p1: updatedFight.f1.player,
-        p2: updatedFight.f2.player,
+        p1: updatedFight.fighter1.player,
+        p2: updatedFight.fighter2.player,
         blockNumber: updatedFight.block,
       });
       await db
@@ -574,7 +574,7 @@ export const updateFight = async (change: any, admin: any) => {
     }
 
     if (!previous.updateStats && updatedFight.updateStats) {
-      await tournamentFunctions.updateFighterStatsForFight(db, updatedFight);
+      await tournamentFunctions.updateStatsForFightResult(db, updatedFight);
     }
   } catch (error) {
     console.error(error);
