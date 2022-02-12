@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import * as admin from 'firebase-admin';
+import { delay } from '../src/utils';
 import { scheduleTournamentForBlock } from '../src/tournament';
 
 admin.initializeApp({
@@ -38,6 +39,7 @@ const setupTournament = async () => {
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING TOURNAMENT TEST ---");
   await reUpdateFighterRankings();
+  delay(1000);
   await setupTournament();
   console.log("--- END TOURNAMENT TEST ---\n\n");
 }

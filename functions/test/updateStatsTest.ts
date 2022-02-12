@@ -1,8 +1,8 @@
 require('dotenv').config();
 
 import * as admin from 'firebase-admin';
-import { allBufficornPlayers } from './data/bufficornPlayers';
 import * as testData from "./testData";
+import { delay } from '../src/utils';
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
@@ -48,12 +48,6 @@ const updateFighterStats = async () => {
   } catch (error) {
     console.error(`updateFighterStats failed, error: ${error}`);
   }
-}
-
-function delay(d: any) {
-  return new Promise((fulfill) => {
-    setTimeout(fulfill, d);
-  });
 }
 
 const runTestDataSetup = async () => {

@@ -5,12 +5,7 @@ import * as testData from "./testData";
 import { bufficornContract, allBufficorn, allBufficornPlayers } from './data/bufficornPlayers';
 import * as functions from 'firebase-functions';
 import fetch from 'node-fetch';
-
-function delay(d: any) {
-  return new Promise((fulfill) => {
-    setTimeout(fulfill, d);
-  });
-}
+import { delay } from '../src/utils';
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
