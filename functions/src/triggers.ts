@@ -589,7 +589,7 @@ const logFighterRegistrationToDiscord = async (db: any, fighter: any) => {
     ]
   }
 
-  const discordResult = await fetch('https://discord.com/api/webhooks/941713009364054138/P-Ix4i9io5V4EGYaimOu0fVcRictpqbvHR8QmwK82_0e3qp-s8JbkQY2Flccv_Ksv52B', {
+  const discordResult = await fetch('https://discord.com/api/webhooks/942251895995645962/OyyQD5Uf5SjFSsPgragmgx9l9Thhcv6JUv9ikd0MiP3SC5qIB4n-Z6QmK_A7mdfRncgE', {
     method: 'POST',
     body: JSON.stringify(fighterJson),
     headers: { 
