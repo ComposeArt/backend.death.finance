@@ -580,7 +580,7 @@ const logFighterRegistrationToDiscord = async (db: any, fighter: any) => {
         ],
         author: {
           name: `${fighter.player.name}`,
-          url: `https://death.finance/season/0/fighters/${fighter.id}`
+          url: `https://${functions.config().app.id === 'deathfinance' ? 'dev.' : ''}death.finance/season/0/fighters/${fighter.id}`
         },
         image: {
           url: `${fighter.player.image_url}`

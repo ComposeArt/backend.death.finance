@@ -258,7 +258,7 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
   }
   matchString += `${match.player2.name}`;
   matchString += ` after ${(fightLog.length - 2) / 9} bouts!`;
-  matchString += `\n\nhttps://death.finance/season/0/matches/${matchId}`;
+  matchString += `\n\nhttps://${functions.config().app.id === 'deathfinance' ? 'dev.' : ''}death.finance/season/0/matches/${matchId}`;
 
   const discordResult = await fetch('https://discord.com/api/webhooks/941713009364054138/P-Ix4i9io5V4EGYaimOu0fVcRictpqbvHR8QmwK82_0e3qp-s8JbkQY2Flccv_Ksv52B', {
     method: 'POST',
