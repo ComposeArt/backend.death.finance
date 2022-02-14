@@ -561,39 +561,39 @@ const logFighterRegistrationToDiscord = async (db: any, fighter: any) => {
     .get();
 
   const fighterJson = {
-    'content': (ownerDoc.exists && 'discord' in ownerDoc.data()) ? `**<@${ownerDoc.data().discord.uid}> just registered a new fighter!**` : '**New fighter registered!**',
-    'embeds': [
+    content: (ownerDoc.exists && 'discord' in ownerDoc.data()) ? `**<@${ownerDoc.data().discord.uid}> just registered a new fighter!**` : '**New fighter registered!**',
+    embeds: [
       {
-        'title': `Power Level: ${fighter.player.power}`,
-        'color': null,
-        'fields': [
+        title: `Power Level: ${fighter.player.power}`,
+        color: null,
+        fields: [
           {
-            'name': 'Stats',
-            'value': `special attack: ${fighter.player.special_attack}\ndefense: ${fighter.player.defense}\nspecial element: ${fighter.player.special_element}`,
-            'inline': true
+            name: 'Stats',
+            value: `special attack: ${fighter.player.special_attack}\ndefense: ${fighter.player.defense}\nspecial element: ${fighter.player.special_element}`,
+            inline: true
           },
           {
-            'name': '_',
-            'value': `attack: ${fighter.player.attack}\nhealth: ${fighter.player.health}\nelement: ${fighter.player.element}`,
-            'inline': true
+            name: '_',
+            value: `attack: ${fighter.player.attack}\nhealth: ${fighter.player.health}\nelement: ${fighter.player.element}`,
+            inline: true
           }
         ],
-        'author': {
-          'name': `${fighter.player.name}`,
-          'url': `https://death.finance/season/0/fighters/${fighter.id}`
+        author: {
+          name: `${fighter.player.name}`,
+          url: `https://death.finance/season/0/fighters/${fighter.id}`
         },
-        'image': {
-          'url': `${fighter.player.image_url}`
+        image: {
+          url: `${fighter.player.image_url}`
         }
       }
     ]
-  }
+  };
 
   const discordResult = await fetch('https://discord.com/api/webhooks/942251895995645962/OyyQD5Uf5SjFSsPgragmgx9l9Thhcv6JUv9ikd0MiP3SC5qIB4n-Z6QmK_A7mdfRncgE', {
     method: 'POST',
     body: JSON.stringify(fighterJson),
-    headers: { 
-      'Content-Type': 'application/json' 
+    headers: {
+      'Content-Type': 'application/json'
     }
   });
 

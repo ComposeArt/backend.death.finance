@@ -70,7 +70,7 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
       updateStats: true,
       simulate: false,
     });
-  
+
   await logMatchOutcomeToDiscord(db, matchId, fightLog);
 };
 
@@ -228,7 +228,6 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) => {
-  
   const matchDoc = await db.collection('nft-death-games')
     .doc('season_0')
     .collection('matches')
@@ -248,12 +247,12 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
     .doc(match.owner2)
     .get();
 
-  let matchString = "";
+  let matchString = '';
   if (owner1Doc.exists && 'discord' in owner1Doc.data()) {
     matchString += `<@${owner1Doc.data().discord.uid}>'s `;
   }
   matchString += `${match.player1.name}`;
-  matchString += fightLog[fightLog.length - 1] == '0' ? ` defeats ` : ` is defeated by `;
+  matchString += fightLog[fightLog.length - 1] === '0' ? ` defeats ` : ` is defeated by `;
   if (owner2Doc.exists && 'discord' in owner2Doc.data()) {
     matchString += `<@${owner2Doc.data().discord.uid}>'s `;
   }
@@ -266,8 +265,8 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
     body: JSON.stringify({
       content: matchString
     }),
-    headers: { 
-      'Content-Type': 'application/json' 
+    headers: {
+      'Content-Type': 'application/json'
     }
   });
 
