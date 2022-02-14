@@ -22,7 +22,7 @@ const registerFighterFxn = async () => {
     ownerAddress: testData.fighter1.owner,
     collection: testData.fighter1.collection,
     contract: '0xfa10661c28f309b88aecf14d9ab8f24764d6b10d',
-    token_id: testData.player1.tokenId,
+    token_id: testData.player1.token_id,
     playerId: testData.player1.id
   }).catch((error) => {
     console.error("registerFighterFxn failed, received error %s", getErrorMessage(error));
@@ -36,7 +36,7 @@ const registerAnotherFighterFxn = async () => {
     ownerAddress: testData.fighter2.owner,
     collection: testData.fighter2.collection,
     contract: '0xf4cd7e65348deb24e30dedee639c4936ae38b763',
-    token_id: testData.player2.tokenId,
+    token_id: testData.player2.token_id,
     playerId: testData.player2.id
   }).catch((error) => {
     console.error("registerAnotherFighterFxn failed, received error %s", getErrorMessage(error));

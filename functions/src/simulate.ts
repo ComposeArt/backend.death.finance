@@ -2,6 +2,7 @@ require('dotenv').config();
 
 import _ from 'lodash';
 import moment from 'moment';
+import fetch from 'node-fetch';
 import { ethers } from 'ethers';
 import * as functions from 'firebase-functions';
 import nodeHtmlToImage from 'node-html-to-image';
@@ -69,6 +70,8 @@ export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: a
       updateStats: true,
       simulate: false,
     });
+  
+  await logMatchOutcomeToDiscord(db, matchId, fightLog);
 };
 
 export const simulateFight = async (
@@ -222,4 +225,53 @@ const getErrorMessage = (error: unknown) => {
   }
 
   return '';
+};
+
+const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) => {
+  
+  const matchDoc = await db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('matches')
+    .doc(matchId)
+    .get();
+  const match = matchDoc.data();
+
+  const owner1Doc = await db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('users')
+    .doc(match.owner1)
+    .get();
+
+  const owner2Doc = await db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('users')
+    .doc(match.owner2)
+    .get();
+
+  let matchString = "";
+  if (owner1Doc.exists && 'discord' in owner1Doc.data()) {
+    matchString += `<@${owner1Doc.data().discord.uid}>'s `;
+  }
+  matchString += `${match.player1.name}`;
+  matchString += fightLog[fightLog.length - 1] == '0' ? ` defeats ` : ` is defeated by `;
+  if (owner2Doc.exists && 'discord' in owner2Doc.data()) {
+    matchString += `<@${owner2Doc.data().discord.uid}>'s `;
+  }
+  matchString += `${match.player2.name}`;
+  matchString += ` after ${(fightLog.length - 2) / 9} bouts!`;
+  matchString += `\n\nhttps://death.finance/season/0/matches/${matchId}`;
+
+  const discordResult = await fetch('https://discord.com/api/webhooks/941713009364054138/P-Ix4i9io5V4EGYaimOu0fVcRictpqbvHR8QmwK82_0e3qp-s8JbkQY2Flccv_Ksv52B', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: matchString
+    }),
+    headers: { 
+      'Content-Type': 'application/json' 
+    }
+  });
+
+  if (discordResult.status !== 204) {
+    throw new Error(`Request to Discord failed`);
+  }
 };

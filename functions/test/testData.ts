@@ -18,7 +18,7 @@ export const player1 = {
   season: "season_0",
   special_attack: 15,
   special_element: 1,
-  tokenId: "1740"
+  token_id: "1740"
 }
 
 export const fighter1 = {
@@ -54,7 +54,7 @@ export const player2 = {
   season: "season_0",
   special_attack: 15,
   special_element: 9,
-  tokenId: "1051"
+  token_id: "1051"
 }
 
 export const fighter2 = {

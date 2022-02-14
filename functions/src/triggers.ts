@@ -1,8 +1,7 @@
 import _ from 'lodash';
+import fetch from 'node-fetch';
 import nodeHtmlToImage from 'node-html-to-image';
-import { ethers } from 'ethers';
 
-import FightClub from './FightClub.json';
 import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
 import * as matchesFunctions from './matches/matches';
@@ -385,11 +384,11 @@ const updateMatchImage = async (db: any, storage: any, match: any) => {
 const updateFighterImage = async (db: any, storage: any, fighter: any) => {
   try {
     if (fighter !== undefined) {
-      fighter = fighter.player;
+      const player = fighter.player;
 
-      if (fighter !== undefined) {
+      if (player !== undefined) {
         const bucket = storage.bucket();
-        const fileName = `fighters/${fighter.id}.png`;
+        const fileName = `fighters/${player.id}.png`;
         const file = bucket.file(fileName);
         const exists = await file.exists();
 
@@ -403,10 +402,10 @@ const updateFighterImage = async (db: any, storage: any, fighter: any) => {
                 <body style="width: 1024px; height: 512px;">
                   <div style="background-color: #1A202C; width: 1024px; height: 512px; display: flex; justify-content: center; align-items: center;">
                     <div style="width: 512px; height: 512px;">
-                      <img style="width: 512px; height: 512px; opacity: 0.6;" src="${fighter.image_url}" />
+                      <img style="width: 512px; height: 512px; opacity: 0.6;" src="${player.image_url}" />
                     </div>
                     <div style="font-family: 'Fira Mono', monospace; font-weight: 900; text-align: center; font-size: 32px; color: white; width: 500px; height: 80px; position: absolute; z-index: 10; left: 6px; bottom: 100px;">
-                      ${fighter.collection} #${_.truncate(fighter.token_id, { length: 7 })}
+                      ${player.collection} #${_.truncate(player.token_id, { length: 7 })}
                     </div>
                     <div style="width: 512px; height: 512px;">
                       <img style="width: 256px; height: 256px; position: absolute; top: 100px; right: 128px;" src="https://death.finance/fight-club-logo-light.png" />
@@ -429,6 +428,9 @@ const updateFighterImage = async (db: any, storage: any, fighter: any) => {
     await db.collection('nft-death-games').doc('season_0').collection('fighters').doc(fighter.id).update({
       updateImage: false,
     });
+
+    await logFighterRegistrationToDiscord(db, fighter);
+
   } catch (error) {
     console.error(error);
   }
@@ -549,4 +551,53 @@ const getErrorMessage = (error: unknown) => {
   }
 
   return '';
+};
+
+const logFighterRegistrationToDiscord = async (db: any, fighter: any) => {
+  const ownerDoc = await db.collection('nft-death-games')
+    .doc('season_0')
+    .collection('users')
+    .doc(fighter.owner)
+    .get();
+
+  const fighterJson = {
+    'content': (ownerDoc.exists && 'discord' in ownerDoc.data()) ? `**<@${ownerDoc.data().discord.uid}> just registered a new fighter!**` : '**New fighter registered!**',
+    'embeds': [
+      {
+        'title': `Power Level: ${fighter.player.power}`,
+        'color': null,
+        'fields': [
+          {
+            'name': 'Stats',
+            'value': `special attack: ${fighter.player.special_attack}\ndefense: ${fighter.player.defense}\nspecial element: ${fighter.player.special_element}`,
+            'inline': true
+          },
+          {
+            'name': '_',
+            'value': `attack: ${fighter.player.attack}\nhealth: ${fighter.player.health}\nelement: ${fighter.player.element}`,
+            'inline': true
+          }
+        ],
+        'author': {
+          'name': `${fighter.player.name}`,
+          'url': `https://death.finance/season/0/fighters/${fighter.id}`
+        },
+        'image': {
+          'url': `${fighter.player.image_url}`
+        }
+      }
+    ]
+  }
+
+  const discordResult = await fetch('https://discord.com/api/webhooks/942251895995645962/OyyQD5Uf5SjFSsPgragmgx9l9Thhcv6JUv9ikd0MiP3SC5qIB4n-Z6QmK_A7mdfRncgE', {
+    method: 'POST',
+    body: JSON.stringify(fighterJson),
+    headers: { 
+      'Content-Type': 'application/json' 
+    }
+  });
+
+  if (discordResult.status !== 204) {
+    throw new Error(`Request to Discord failed`);
+  }
 };
