@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import fetch from 'node-fetch';
 import nodeHtmlToImage from 'node-html-to-image';
+import * as functions from 'firebase-functions';
 
 import * as registrationFunctions from './registration';
 import * as simulateFunctions from './simulate';
