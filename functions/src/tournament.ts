@@ -54,11 +54,34 @@ export const scheduleTournamentFirstBrackets = async (
   const zeta: any[] = [];
   const theta: any[] = [];
 
-  paired.forEach((matchup, index) => {
+  /*
+  We want zeta and theta to be as even as possible. Within those tournaments, the best fighters
+  should be on opposite ends of the bracket.
+
+  To do that, we build each tournament from the middle outward. In a 16 fighter example:
+  8-9 -> theta push -> [8-9]
+  7-10 -> zeta push -> [7-10]
+  6-11 -> theta unshift -> [6-11, 8-9]
+  5-12 -> zeta unshift -> [5-12, 7-10]
+  4-13 -> theta push -> [6-11, 8-9, 4-13]
+  3-14 -> zeta push -> [5-12, 7-10, 3-14]
+  2-15 -> theta unshift -> [2-15, 6-11, 8-9, 4-13]
+  1-16 -> zeta unshift -> [1-16, 5-12, 7-10, 3-14]
+  */
+
+  paired.reverse().forEach((matchup, index) => {
     if (index % 2 === 0) {
-      zeta.push(matchup);
+      if (theta.length % 2 === 0) {
+        theta.push(matchup);
+      } else {
+        theta.unshift(matchup);
+      }
     } else {
-      theta.push(matchup);
+      if (zeta.length % 2 === 0) {
+        zeta.push(matchup);
+      } else {
+        zeta.unshift(matchup);
+      }
     }
   });
 
