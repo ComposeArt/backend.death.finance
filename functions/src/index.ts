@@ -22,6 +22,10 @@ export const updateCollectionStats = firebaseFunction.pubsub
   .schedule('every 1 hours')
   .onRun(async () => scheduleFunctions.updateCollectionStats(admin));
 
+export const updateSeasonRankings = firebaseFunction.pubsub
+  .schedule('every 1 hours')
+  .onRun(async () => scheduleFunctions.updateSeasonRankings(admin));
+
 export const updateChaosAdded = firebaseFunction.pubsub
   .schedule('every 1 hours')
   .onRun(async () => scheduleFunctions.updateChaosAdded(admin));

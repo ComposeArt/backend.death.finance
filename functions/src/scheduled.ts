@@ -73,6 +73,21 @@ export const updateCollectionStats = async (admin: any) => {
   }
 };
 
+export const updateSeasonRankings = async (admin: any) => {
+  try {
+    const db = admin.firestore();
+
+    await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .update({
+        updateFighterRankings: true,
+      });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const updateChaosAdded = async (admin: any) => {
   try {
     const db = admin.firestore();
