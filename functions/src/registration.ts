@@ -359,12 +359,13 @@ const getCurrentBlockNumber = async (db: any): Promise<number> => {
 };
 
 const scheduleMatch = async (db: any, firstFighter: any, secondFighter: any, block: number) => {
+  const matchId = `${firstFighter.id}-${secondFighter.id}`;
   await db.collection('nft-death-games')
     .doc('season_0')
     .collection('matches')
-    .doc(`${firstFighter.id}-${secondFighter.id}`)
+    .doc(matchId)
     .set({
-      id: `${firstFighter.id}-${secondFighter.id}`,
+      id: matchId,
       collection1: firstFighter.collection,
       collection2: secondFighter.collection,
       fighter1: firstFighter.id,
