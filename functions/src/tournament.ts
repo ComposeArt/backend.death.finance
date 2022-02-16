@@ -51,9 +51,6 @@ export const scheduleTournamentFirstBrackets = async (
   const [firstHalf, secondHalf] = inHalf(fighters);
   const paired = zip(firstHalf, secondHalf);
 
-  const zeta: any[] = [];
-  const theta: any[] = [];
-
   /*
   We want zeta and theta to be as even as possible. Within those tournaments, the best fighters
   should be on opposite ends of the bracket.
@@ -68,6 +65,9 @@ export const scheduleTournamentFirstBrackets = async (
   2-15 -> theta unshift -> [2-15, 6-11, 8-9, 4-13]
   1-16 -> zeta unshift -> [1-16, 5-12, 7-10, 3-14]
   */
+
+  const zeta: any[] = [];
+  const theta: any[] = [];
 
   paired.reverse().forEach((matchup, index) => {
     if (index % 2 === 0) {
@@ -85,13 +85,13 @@ export const scheduleTournamentFirstBrackets = async (
     }
   });
 
-  scheduleBracket(db, 'zeta', 3, zeta, blockNumber);
-  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
-  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
+  scheduleFirstRoundBracket(db, 'zeta', 3, zeta, blockNumber);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1, false);
+  scheduleEmptyBracket(db, 'zeta', 3, zeta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2, true);
 
-  scheduleBracket(db, 'theta', 3, theta, blockNumber);
-  scheduleEmptyBracket(db, 'theta', 3, theta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1);
-  scheduleEmptyBracket(db, 'theta', 3, theta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2);
+  scheduleFirstRoundBracket(db, 'theta', 3, theta, blockNumber);
+  scheduleEmptyBracket(db, 'theta', 3, theta.length / 2, addedNumberToBlock(blockNumber, twoHoursOfBlocks), 1, false);
+  scheduleEmptyBracket(db, 'theta', 3, theta.length / 4, addedNumberToBlock(blockNumber, twoHoursOfBlocks * 2), 2, true);
 };
 
 export const scheduleTournamentFinalistBrackets = async (
@@ -104,11 +104,11 @@ export const scheduleTournamentFinalistBrackets = async (
   const sigmaStart = addedNumberToBlock(firstRoundBlockStart, 6500);
   const sigmaSize = 16;
 
-  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, sigmaStart, 0);
-  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks), 1);
-  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 2), 2);
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, sigmaStart, 0, false);
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks), 1, false);
+  scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 2), 2, true);
 
-  scheduleEmptyBracket(db, 'omega', 7, 1, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 3), 0);
+  scheduleEmptyBracket(db, 'omega', 7, 1, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 3), 0, true);
 };
 
 const zip = (left: any[], right: any[]): any[] => {
@@ -175,6 +175,7 @@ export const scheduleEmptyBracket = async (
   matchupCount: number,
   blockNumber: string,
   roundNumber: number,
+  isFinalMatch: boolean,
 ) => {
   for (let i = 0; i < matchupCount; i++) {
     const matchupId = `${roundNumber}-${i}`;
@@ -188,9 +189,11 @@ export const scheduleEmptyBracket = async (
           bracket: bracketName,
           fighter1FightWins: 0,
           fighter2FightWins: 0,
+          id: matchupId,
           round: roundNumber,
           slot: i,
           startingBlock: blockNumber,
+          isFinalMatchForTournament: isFinalMatch
         });
 
       console.log(`Scheduled empty bracket ${bracketName} round ${roundNumber} bracket succeeded.`);
@@ -207,7 +210,7 @@ export const scheduleEmptyBracket = async (
   }
 };
 
-export const scheduleBracket = async (
+export const scheduleFirstRoundBracket = async (
   db: any,
   bracketName: string,
   bestOfFights: number,
@@ -229,6 +232,7 @@ export const scheduleBracket = async (
           fighter2: lower,
           fighter1FightWins: 0,
           fighter2FightWins: 0,
+          id: matchupId,
           rank1: higher.ranking,
           rank2: lower.ranking,
           round: 0,
@@ -279,6 +283,7 @@ export const scheduleFightsForTournamentMatchup = async (
         id,
         log: '',
         match_id: matchupId,
+        simulate: false,
         randomness: '',
       };
 
