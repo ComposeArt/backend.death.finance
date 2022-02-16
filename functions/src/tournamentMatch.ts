@@ -13,7 +13,7 @@ const seasonPath = (db: any) => {
 export const handleUpdatedTournamentMatch = (db: any, match: any) => {
   if (tournamentMatchIsCompleted(match) && match.isFinalMatchForTournament) {
     console.log(`updateFighterStatsForMatch final match complete in tournament ${match.bracketName}, ID ${match.id}.`);
-    if (match.bracket == 'omega') {
+    if (match.bracket === 'omega') {
       // season winner
     } else {
       moveFighterToNextTournamentMatch(db, winnerFromTournamentMatch(match), match);
@@ -22,15 +22,16 @@ export const handleUpdatedTournamentMatch = (db: any, match: any) => {
 };
 
 const tournamentMatchIsCompleted = (match: any): boolean => {
-  console.log(`tournamentMatchIsCompleted: ${match.best_of == match.fighter1FightWins + match.fighter2FightWins} (${match.best_of} ${match.fighter1FightWins} ${match.fighter2FightWins})`);
-  return match.best_of == match.fighter1FightWins + match.fighter2FightWins;
+  const completed = match.best_of === match.fighter1FightWins + match.fighter2FightWins;
+  console.log(`tournamentMatchIsCompleted: ${completed}`);
+  return completed;
 };
 
 const winnerFromTournamentMatch = (match: any) => {
   const f1Wins = match.fighter1FightWins;
   const f2Wins = match.fighter2FightWins;
 
-  if (f1Wins == f2Wins) {
+  if (f1Wins === f2Wins) {
     throw new Error(`winnerFromMatch fails because fighters have equal number of fight wins.`);
   }
   if (f1Wins > f2Wins) {
@@ -112,5 +113,4 @@ export const moveFighterToMatch = async (
   } catch (error) {
     console.error(`moveFighterToNextTournament failed with error ${error}`);
   }
-}
-
+};
