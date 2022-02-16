@@ -19,13 +19,15 @@ const updateMatchStats = async () => {
       .get()
     console.log(`updateMatchStats got ${matchesSnap.size} matches.`)
     await Promise.all(matchesSnap.docs.map(async (match) => {
-      console.log(`Setting simulate for match ID ${match.id}`)
-      return db
+      console.log(`Setting simulate for match ID ${match.id}.`)
+      await db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('matches')
         .doc(match.id)
-        .update({ simulate: true });
+        .update({
+          simulate: true
+        });
     }));
     console.log(`updateMatchStats succeeded.`)
   } catch (error) {
