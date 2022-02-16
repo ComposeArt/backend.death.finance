@@ -9,6 +9,7 @@ import * as matchesFunctions from './matches/matches';
 import * as collectionFunctions from './collection';
 import * as seasonFunctions from './season';
 import * as tournamentFunctions from './tournament';
+import * as tournamentMatchFunctions from './tournamentMatch';
 
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
@@ -545,6 +546,12 @@ export const updateSeason = async (change: any, admin: any) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export const updateTournamentMatch = async (change: any, admin: any) => {
+  const match = change.after.data();
+  const db = admin.firestore();
+  tournamentMatchFunctions.handleUpdatedTournamentMatch(db, match);
 };
 
 export const updateFight = async (change: any, admin: any) => {

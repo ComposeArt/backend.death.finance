@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { getPerFighterMatchStats } from './matches/matchesUtils';
+import { moveFighterToMatch } from './tournamentMatch';
 
 /*
 -- Example 128 Fighter Bracket --
@@ -349,43 +350,18 @@ export const updateStatsForFightResult = async (
 
     if (fight.isFinalFight) {
       const fighter1WonMatch = newFighter1Wins > newFighter2Wins;
-      moveFighterToNextRound(db, fighter1WonMatch ? match.fighter1 : match.fighter2, match);
+      moveFighterToNextRoundMatch(db, fighter1WonMatch ? match.fighter1 : match.fighter2, match);
     }
   } catch (error) {
     console.error(`updateStatsForFightResult error ${error}`);
   }
 };
 
-const moveFighterToNextRound = async (db: any, fighter: any, matchFighterWon: any) => {
+const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWon: any) => {
   const nextRound = matchFighterWon.round + 1;
   const nextSlot = Math.floor(matchFighterWon.slot / 2);
 
-  const matchPath = seasonPath(db)
-    .collection('tournament')
-    .doc(matchFighterWon.bracket)
-    .collection('matches')
-    .doc(`${nextRound}-${nextSlot}`);
-
-  /* We retain above/below ordering for visual continuity in a bracket. For example:
-  a _
-     \
-      b
-  b _/
-
-  c _
-     \
-      d
-  d _/
-  For the next round, we always want the winner of c-d to be slotted into player2, and winner of a-b into player1.
-  */
-  const wasUpperSlot = matchFighterWon.slot % 2 === 0;
-  if (wasUpperSlot) {
-    await matchPath.update({
-      fighter1: fighter
-    });
-  } else {
-    await matchPath.update({
-      fighter2: fighter
-    });
-  }
+  const matchId = `${nextRound}-${nextSlot}`;
+  console.log(`Moving fighter ${fighter.id} to the next round: ${matchId}.`);
+  await moveFighterToMatch(db, fighter, matchFighterWon, matchFighterWon.bracket, matchId)
 };
