@@ -38,7 +38,9 @@ export const onCreateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
   .onCreate(async (snap, context) => await triggerFunctions.createFighter(snap, admin));
 
-export const onUpdateFighter = firebaseFunction.firestore
+export const onUpdateFighter = firebaseFunction
+  .runWith({ timeoutSeconds: 300 })
+  .firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateFighter(change, admin));
 
