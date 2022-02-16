@@ -41,11 +41,18 @@ const winnerFromTournamentMatch = (match: any) => {
   }
 };
 
+// Moves fighter to first round of next tournament.
 export const moveFighterToNextTournamentMatch = async (db: any, fighter: any, matchFighterWon: any) => {
-  const bracket: string = matchFighterWon.bracket;
-  const nextTournament = tournamentSuccession.get(bracket)!;
+  const tournament: string = matchFighterWon.bracket;
+  const nextTournament = tournamentSuccession.get(tournament)!;
 
-  const nextSlot = Math.floor(matchFighterWon.slot / 2);
+  let nextSlot = Math.floor(matchFighterWon.slot / 2);
+
+  // sigma is the sweet 16. zeta feeds into the top 8 slots (0 through 7). theta into the bottom 8 slots (8 through 15).
+  if (tournament === "theta") {
+    nextSlot += 8;
+  }
+
   const matchId = `0-${nextSlot}`;
   console.log(`moveFighterToNextTournament with fighter ${fighter.id} from match ${matchFighterWon.id} in ${matchFighterWon.bracket} to ${matchId} in ${nextTournament}.`);
   await moveFighterToMatch(db, fighter, matchFighterWon, nextTournament, matchId);
