@@ -10,6 +10,7 @@ import * as collectionFunctions from './collection';
 import * as seasonFunctions from './season';
 import * as tournamentFunctions from './tournament';
 import * as tournamentMatchFunctions from './tournamentMatch';
+import { emulatorLog } from './utils';
 
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
@@ -68,6 +69,8 @@ export const updateMatch = async (change: any, admin: any) => {
         blockNumber: match.block,
       });
 
+      emulatorLog(`Received fight results for ${match.player1.id} and ${match.player2.id}.`);
+
       await simulateFunctions.saveFightResultsToMatch(
         db,
         match.id,
@@ -93,6 +96,7 @@ export const updateFighter = async (change: any, admin: any) => {
 
   try {
     if (!oldFighter.updateMatches && fighter.updateMatches) {
+      emulatorLog(`Scheduling pre-season matches for fighter ${fighter.id}.`);
       await registrationFunctions.schedulePreSeasonMatches(db, fighter);
     }
 
@@ -101,6 +105,7 @@ export const updateFighter = async (change: any, admin: any) => {
     }
 
     if (!oldFighter.updateStats && fighter.updateStats) {
+      emulatorLog(`Updating stats for fighter ${fighter.id}.`);
       await updateFighterStats(db, fighter);
     }
   } catch (error) {

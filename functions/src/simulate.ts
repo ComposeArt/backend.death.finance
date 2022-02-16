@@ -7,6 +7,7 @@ import { ethers } from 'ethers';
 import * as functions from 'firebase-functions';
 import nodeHtmlToImage from 'node-html-to-image';
 import FightClub from './FightClub.json';
+import { emulatorLog } from './utils';
 
 export const getFightClubContract = async (db: any) => {
   const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
@@ -43,6 +44,7 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
 };
 
 export const getFightSimulationResults = async ({ db, p1, p2, blockNumber }: any) => {
+  emulatorLog(`getFightSimulationResults called for block ${blockNumber} and ${p1.id} + ${p2.id}.`);
   const fightClub = await getFightClubContract(db);
   try {
 
@@ -60,6 +62,7 @@ export const getFightSimulationResults = async ({ db, p1, p2, blockNumber }: any
 };
 
 export const saveFightResultsToMatch = async (db: any, matchId: any, fightLog: any, randomness: string) => {
+  emulatorLog(`Saving fight results to match ${matchId}.`);
   await db
     .collection('nft-death-games')
     .doc('season_0')

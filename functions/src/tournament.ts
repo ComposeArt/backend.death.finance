@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { getPerFighterMatchStats } from './matches/matchesUtils';
 import { moveFighterToMatch } from './tournamentMatch';
+import { emulatorLog } from './utils';
 
 /*
 -- Example 128 Fighter Bracket --
@@ -157,7 +158,7 @@ export const runFightsForBlock = async (
       .docs
       .map((f: any) => f.data())
       .map(async (fight: any) => {
-        console.log(`HMM ${fight.id}`);
+        emulatorLog(`Running fight ${fight.id} for block ${blockNumber}.`)
         return fightsPath(db)
           .doc(fight.id)
           .update({
@@ -197,14 +198,14 @@ export const scheduleEmptyBracket = async (
           isFinalMatchForTournament: isFinalMatch
         });
 
-      console.log(`Scheduled empty bracket ${bracketName} round ${roundNumber} bracket succeeded.`);
+      emulatorLog(`Scheduled empty bracket ${bracketName} round ${roundNumber} bracket succeeded.`);
     } catch (error) {
       console.error(`Scheduling empty bracket ${bracketName} round ${roundNumber} failed: ${error}`);
     }
 
     try {
       await scheduleFightsForTournamentMatchup(db, bracketName, bestOfFights, matchupId, blockNumber);
-      console.log(`Scheduling fights for matchup ${bracketName} succeeded.`);
+      emulatorLog(`Scheduling fights for matchup ${bracketName} succeeded.`);
     } catch (error) {
       console.error(`Scheduling empty fights for ${bracketName} round ${roundNumber} failed: ${error}`);
     }
@@ -241,14 +242,14 @@ export const scheduleFirstRoundBracket = async (
           startingBlock: blockNumber,
         });
 
-      console.log(`Scheduling ${bracketName} bracket succeeded.`);
+      emulatorLog(`Scheduling ${bracketName} bracket succeeded.`);
     } catch (error) {
       console.error(`Creating tournament ${bracketName} match between ${higher.id} and ${lower.id} failed: ${error}`);
     }
 
     try {
       await scheduleFightsForTournamentMatchup(db, bracketName, bestOfFights, matchupId, blockNumber, higher, lower);
-      console.log(`Scheduling fights for matchup ${bracketName} succeeded.`);
+      emulatorLog(`Scheduling fights for matchup ${bracketName} succeeded.`);
     } catch (error) {
       console.error(`Scheduling fights for ${bracketName} match between ${higher.id} and ${lower.id} failed: ${error}`);
     }
@@ -272,7 +273,7 @@ export const scheduleFightsForTournamentMatchup = async (
   fighter2?: any,
 ) => {
   try {
-    console.log(`scheduleFightsForTournamentMatchup with ${bestOf} rounds.`);
+    emulatorLog(`scheduleFightsForTournamentMatchup with ${bestOf} rounds.`);
     for (let i = 0; i < bestOf; i++) {
       let fightBlock = addedNumberToBlock(blockNumber, i).toString();
       fightBlock = increasedToNextFightingBlock(fightBlock);
@@ -368,6 +369,6 @@ const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWo
   const nextSlot = Math.floor(matchFighterWon.slot / 2);
 
   const matchId = `${nextRound}-${nextSlot}`;
-  console.log(`Moving fighter ${fighter.id} to the next round: ${matchId}.`);
+  emulatorLog(`Moving fighter ${fighter.id} to the next round: ${matchId}.`);
   await moveFighterToMatch(db, fighter, matchFighterWon, matchFighterWon.bracket, matchId)
 };

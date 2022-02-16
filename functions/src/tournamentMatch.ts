@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { emulatorLog } from './utils';
 
 const tournamentSuccession = new Map<string, string>([
   ['zeta', 'sigma'],
@@ -23,7 +24,7 @@ export const handleUpdatedTournamentMatch = (db: any, match: any) => {
 
 const tournamentMatchIsCompleted = (match: any): boolean => {
   const completed = match.best_of === match.fighter1FightWins + match.fighter2FightWins;
-  console.log(`tournamentMatchIsCompleted: ${completed}`);
+  emulatorLog(`tournamentMatchIsCompleted: ${completed}`);
   return completed;
 };
 
@@ -54,7 +55,7 @@ export const moveFighterToNextTournamentMatch = async (db: any, fighter: any, ma
   }
 
   const matchId = `0-${nextSlot}`;
-  console.log(`moveFighterToNextTournament with fighter ${fighter.id} from match ${matchFighterWon.id} in ${matchFighterWon.bracket} to ${matchId} in ${nextTournament}.`);
+  emulatorLog(`moveFighterToNextTournament with fighter ${fighter.id} from match ${matchFighterWon.id} in ${matchFighterWon.bracket} to ${matchId} in ${nextTournament}.`);
   await moveFighterToMatch(db, fighter, matchFighterWon, nextTournament, matchId);
 };
 
