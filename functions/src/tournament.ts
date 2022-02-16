@@ -358,6 +358,12 @@ export const updateStatsForFightResult = async (
 };
 
 const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWon: any) => {
+  if (matchFighterWon.isFinalMatchForTournament) {
+    // There is not a new round in this tournament to move to. Returning early,
+    // fighter will be scheduled to first round in next tournament elsewhere.
+    return;
+  }
+
   const nextRound = matchFighterWon.round + 1;
   const nextSlot = Math.floor(matchFighterWon.slot / 2);
 
