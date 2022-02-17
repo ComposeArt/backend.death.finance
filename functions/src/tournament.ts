@@ -50,7 +50,7 @@ export const scheduleTournamentFirstBrackets = async (
   blockNumber: string,
 ) => {
   const fighters = await getAllFightersRankedOrder(db);
-  const [firstHalf, secondHalf] = inHalf(fighters);
+  const {firstHalf, secondHalf} = inHalf(fighters);
   const paired = zip(firstHalf, secondHalf);
 
   /*
@@ -125,17 +125,18 @@ const getAllFightersRankedOrder = async (db: any) => {
     .collection('fighters')
     .where('is_doping', '==', false)
     .where('is_invalid', '==', false)
+    .limit(128)
     .orderBy('ranking')
     .get();
   return snapshot.docs.map((f: any) => f.data());
 };
 
-const inHalf = (array: any[]): any[] => {
+const inHalf = (array: any[]): any => {
   const midIndex = Math.ceil(array.length / 2);
 
   const firstHalf = array.slice(0, midIndex);
   const secondHalf = array.slice(-midIndex).reverse();
-  return [firstHalf, secondHalf];
+  return {firstHalf, secondHalf};
 };
 
 const tournamentPath = (db: any) => {
