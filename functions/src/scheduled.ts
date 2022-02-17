@@ -1,14 +1,9 @@
 import * as functions from 'firebase-functions';
-import { ethers } from 'ethers';
 import _ from 'lodash';
+import { delay } from './utils';
+import { ethers } from 'ethers';
 
 import FightClub from './FightClub.json';
-
-function delay(d: any) {
-  return new Promise ((fulfill) => {
-    setTimeout(fulfill, d);
-  });
-}
 
 export const updateGoerli = async (admin: any) => {
   try {

@@ -2,10 +2,10 @@ require('dotenv').config();
 
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getPerFighterMatchStats, ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
+import { ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/matches";
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
-import * as testData from "./testData";
+import { getPerFighterMatchStats } from "../src/matches/matchesUtils";
 
 const app = initializeApp({
   apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
@@ -16,8 +16,6 @@ const app = initializeApp({
 
 const functions = getFunctions(app);
 connectFunctionsEmulator(functions, "localhost", 5001);
-const simulateFight = httpsCallable(functions, 'simulateFight');
-const registerFighter = httpsCallable(functions, 'registerFighter');
 const simulateMatchStatsFighter2Fucked = () => {
   // Copy of match https://death.finance/simulator/2rnmr94SUwk2ymtxN2Jz
   console.log(`simulateMatchStatsPlayer2Fucked began.`);
@@ -53,7 +51,7 @@ const simulateMatchStatsFighter2Fucked = () => {
 const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence began.`);
-  const f1 = {
+  const fighter1 = {
     attack: 6,
     defense: 10,
     element: 6,
@@ -64,7 +62,7 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
     special_element: 10,
   }
 
-  const f2 = {
+  const fighter2 = {
     attack: 14,
     defense: 15,
     element: 3,
@@ -77,8 +75,8 @@ const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
 
   const result = getPerFighterMatchStats(
     "10011100001101000000011000001000000100101000001100001000101000001110011000010000001010101001",
-    f1,
-    f2);
+    fighter1,
+    fighter2);
   console.log(`simulateMatchStatsTieDyeOnTieDyeViolence results: ${JSON.stringify(result)}\n`);
 };
 

@@ -38,7 +38,9 @@ export const onCreateFighter = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
   .onCreate(async (snap, context) => await triggerFunctions.createFighter(snap, admin));
 
-export const onUpdateFighter = firebaseFunction.firestore
+export const onUpdateFighter = firebaseFunction
+  .runWith({ timeoutSeconds: 540 })
+  .firestore
   .document('nft-death-games/{seasonId}/fighters/{fighterId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateFighter(change, admin));
 
@@ -65,6 +67,14 @@ export const onUpdateSeason = firebaseFunction.firestore
 export const onUpdateUser = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/users/{userId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateUser(change, admin));
+
+export const onUpdateFight = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/fights/{fightId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateFight(change, admin));
+
+export const onUpdateTournamentMatch = firebaseFunction.firestore
+  .document('nft-death-games/{seasonId}/tournament/{tournamentId}/matches/{matchId}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateTournamentMatch(change, admin));
 
 // ------------------ //
 //      CALLABLE      //

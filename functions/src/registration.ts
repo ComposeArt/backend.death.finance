@@ -127,6 +127,14 @@ export const registerFighter = async (admin: any, { ownerAddress, collection, co
   const db = admin.firestore();
 
   try {
+    const season = await db.collection('nft-death-games')
+      .doc('season_0')
+      .get();
+
+    if (season.registrationClosed) {
+      throw new Error(`Registration is currently closed; tournament starts soon.`);
+    }
+
     console.log(`On OpenSea, fetching contract ${contract} and token ${token_id}.`);
     const openSeaResult = await fetch(`https://api.opensea.io/api/v1/asset/${contract}/${token_id}`, {
       headers: {
@@ -351,12 +359,13 @@ const getCurrentBlockNumber = async (db: any): Promise<number> => {
 };
 
 const scheduleMatch = async (db: any, firstFighter: any, secondFighter: any, block: number) => {
+  const matchId = `${firstFighter.id}-${secondFighter.id}`;
   await db.collection('nft-death-games')
     .doc('season_0')
     .collection('matches')
-    .doc(`${firstFighter.id}-${secondFighter.id}`)
+    .doc(matchId)
     .set({
-      id: `${firstFighter.id}-${secondFighter.id}`,
+      id: matchId,
       collection1: firstFighter.collection,
       collection2: secondFighter.collection,
       fighter1: firstFighter.id,

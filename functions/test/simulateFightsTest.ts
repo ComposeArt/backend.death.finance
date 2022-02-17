@@ -94,10 +94,10 @@ const getErrorMessage = (error: unknown) => {
 
 
 const runTestDataSetup = async () => {
-  console.log("--- BEGINNING DATA SETUP ---");
+  console.log("--- BEGINNING SIMULATEFIGHTS TEST  ---");
   await registerFighterFxn();
   await registerAnotherFighterFxn();
   await simulateFightFxn();
-  console.log("--- END DATA SETUP ---\n\n");
+  console.log("--- END SIMULATEFIGHTS TEST ---\n\n");
 }
 runTestDataSetup();

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 import * as admin from 'firebase-admin';
 import * as testData from "./testData";
+import { delay } from '../src/utils';
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
@@ -11,15 +12,22 @@ let db = admin.firestore();
 const updateMatchStats = async () => {
   console.log("updateMatchStats began.");
   try {
-    const firstMatchId = `${testData.fighter1.id}-${testData.fighter2.id}`;
-    const secondMatchId = `${testData.fighter2.id}-${testData.fighter1.id}`;
-    await Promise.all([firstMatchId, secondMatchId].map(async (matchId) => {
-      return db
+    const matchesSnap = await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .collection('matches')
+      .get()
+    console.log(`updateMatchStats got ${matchesSnap.size} matches.`)
+    await Promise.all(matchesSnap.docs.map(async (match) => {
+      console.log(`Setting simulate for match ID ${match.id}.`)
+      await db
         .collection('nft-death-games')
         .doc('season_0')
         .collection('matches')
-        .doc(matchId)
-        .update({ simulate: true });
+        .doc(match.id)
+        .update({
+          simulate: true
+        });
     }));
     console.log(`updateMatchStats succeeded.`)
   } catch (error) {
@@ -44,19 +52,13 @@ const updateFighterStats = async () => {
   }
 }
 
-function delay(d: any) {
-  return new Promise((fulfill) => {
-    setTimeout(fulfill, d);
-  });
-}
-
 const runTestDataSetup = async () => {
-  console.log("--- BEGINNING DATA SETUP ---");
+  console.log("--- BEGINNING UPDATESTATS ---");
   await updateMatchStats();
 
   // Needed so the triggers in updateMatchStats can complete.
   await delay(5000);
   await updateFighterStats();
-  console.log("--- END DATA SETUP ---\n\n");
+  console.log("--- END UPDATESTATS ---\n\n");
 }
 runTestDataSetup();
