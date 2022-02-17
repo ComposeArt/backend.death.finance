@@ -236,6 +236,7 @@ export const scheduleFirstRoundBracket = async (
           fighter1FightWins: 0,
           fighter2FightWins: 0,
           id: matchupId,
+          isFinalMatchForTournament: false,
           rank1: higher.ranking,
           rank2: lower.ranking,
           round: 0,
