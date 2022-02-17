@@ -8,6 +8,6 @@ export function delay(d: any) {
 
 export function emulatorLog(message: string) {
   if (process.env.FUNCTIONS_EMULATOR) {
-    console.log(message)
+    console.log(message);
   }
 }

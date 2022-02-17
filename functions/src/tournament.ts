@@ -114,7 +114,7 @@ export const scheduleTournamentFinalistBrackets = async (
 };
 
 const zip = (left: any[], right: any[]): any[] => {
-  return left.map(function(item, i) {
+  return left.map((item, i) => {
     return [item, right[i]];
   });
 };
@@ -159,7 +159,7 @@ export const runFightsForBlock = async (
       .docs
       .map((f: any) => f.data())
       .map(async (fight: any) => {
-        emulatorLog(`Running fight ${fight.id} for block ${blockNumber}.`)
+        emulatorLog(`Running fight ${fight.id} for block ${blockNumber}.`);
         return fightsPath(db)
           .doc(fight.id)
           .update({
@@ -372,5 +372,5 @@ const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWo
 
   const matchId = `${nextRound}-${nextSlot}`;
   emulatorLog(`Moving fighter ${fighter.id} to the next round: ${matchId}.`);
-  await moveFighterToMatch(db, fighter, matchFighterWon, matchFighterWon.bracket, matchId)
+  await moveFighterToMatch(db, fighter, matchFighterWon, matchFighterWon.bracket, matchId);
 };

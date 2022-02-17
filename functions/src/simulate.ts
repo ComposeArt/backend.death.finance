@@ -255,12 +255,12 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
   if (owner1Doc.exists && 'discord' in owner1Doc.data()) {
     matchString += `<@${owner1Doc.data().discord.uid}>'s `;
   }
-  matchString += `${match.player1.name}`;
+  matchString += `${match.player1.name || `|${match.player1.collection}_#${_.truncate(match.player1.token_id, { length: 7 })}|`}`;
   matchString += fightLog[fightLog.length - 1] === '0' ? ` defeats ` : ` is defeated by `;
   if (owner2Doc.exists && 'discord' in owner2Doc.data()) {
     matchString += `<@${owner2Doc.data().discord.uid}>'s `;
   }
-  matchString += `${match.player2.name}`;
+  matchString += `${match.player2.name || `|${match.player2.collection}_#${_.truncate(match.player2.token_id, { length: 7 })}|`}`;
   matchString += ` after ${(fightLog.length - 2) / 9} bouts!`;
   matchString += `\n\nhttps://${functions.config().app.id === 'deathfinance' ? 'dev.' : ''}death.finance/season/0/matches/${matchId}`;
 

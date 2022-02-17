@@ -50,7 +50,7 @@ export const moveFighterToNextTournamentMatch = async (db: any, fighter: any, ma
   let nextSlot = Math.floor(matchFighterWon.slot / 2);
 
   // sigma is the sweet 16. zeta feeds into the top 8 slots (0 through 7). theta into the bottom 8 slots (8 through 15).
-  if (tournament === "theta") {
+  if (tournament === 'theta') {
     nextSlot += 8;
   }
 
@@ -92,7 +92,7 @@ export const moveFighterToMatch = async (
     */
 
     // const wasUpperSlot = matchFighterWon.slot % 2 === 0;
-    const upperSlot = (Math.floor(matchFighterWon.slot / 2) % 2) == 0
+    const upperSlot = (Math.floor(matchFighterWon.slot / 2) % 2) === 0;
     // Assign fighter object to new match.
     if (upperSlot) {
       await matchPath.update({
