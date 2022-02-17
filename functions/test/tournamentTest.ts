@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import * as admin from 'firebase-admin';
 import { delay } from '../src/utils';
-import { scheduleTournamentForBlock } from '../src/tournament';
+import { scheduleSeasonForBlock } from '../src/tournament';
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
@@ -29,7 +29,7 @@ const reUpdateFighterRankings = async () => {
 const setupTournament = async () => {
   console.log("setupTournament began.");
   try {
-    await scheduleTournamentForBlock(db, "6361641");
+    await scheduleSeasonForBlock(db, "6361641");
     console.log("setupTournament succeeded.");
   } catch (error) {
     console.error(`setupTournament failed, error: ${error}`);
