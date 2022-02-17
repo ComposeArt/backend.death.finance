@@ -56,6 +56,9 @@ export const moveFighterToNextTournamentMatch = async (db: any, fighter: any, ma
 
   const matchId = `0-${nextSlot}`;
   emulatorLog(`moveFighterToNextTournament with fighter ${fighter.id} from match ${matchFighterWon.id} in ${matchFighterWon.bracket} to ${matchId} in ${nextTournament}.`);
+
+  // Taking the slot value from `matchFighterWon` for the upper/lower slot _happens_ to work because we are shifting the slot an even
+  // amount. This would only break down if we had a tournamnet with an odd number of slots (possibly in a bye situation).
   await moveFighterToMatch(db, fighter, matchFighterWon, nextTournament, matchId);
 };
 
