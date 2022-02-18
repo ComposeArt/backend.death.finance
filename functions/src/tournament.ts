@@ -3,12 +3,15 @@ import { getPerFighterMatchStats } from './matches/matchesUtils';
 import { moveFighterToMatch } from './tournamentMatch';
 import { emulatorLog } from './utils';
 
+let seasonId: string;
+
 // -- ENTRY POINT --
 export const scheduleTournamentsWithStartingBlock = async (
   db: any,
   season: any,
   blockNumber: string
 ) => {
+  seasonId = season.id;
   const block = increasedToNextFightingBlock(blockNumber);
   try {
     await scheduleTournamentFirstBrackets(db, block);
@@ -125,7 +128,7 @@ const zip = (left: any[], right: any[]): any[] => {
 
 const getAllFightersRankedOrder = async (db: any) => {
   const snapshot = await db.collection('nft-death-games')
-    .doc('season_0')
+    .doc(seasonId)
     .collection('fighters')
     .where('is_doping', '==', false)
     .where('is_invalid', '==', false)
@@ -296,7 +299,7 @@ export const scheduleFightsForTournamentMatchup = async (
 
       await db
         .collection('nft-death-games')
-        .doc('season_0')
+        .doc(seasonId)
         .collection('fights')
         .doc(id)
         .create(fight);
@@ -368,7 +371,7 @@ const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWo
 };
 
 const seasonPath = (db: any) => {
-  return db.collection('nft-death-games').doc('season_0');
+  return db.collection('nft-death-games').doc(seasonId);
 };
 
 const tournamentPath = (db: any) => {
