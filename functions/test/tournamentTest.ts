@@ -2,7 +2,6 @@ require('dotenv').config();
 
 import * as admin from 'firebase-admin';
 import { delay } from '../src/utils';
-import { scheduleSeasonForBlock } from '../src/tournament';
 
 admin.initializeApp({
   projectId: 'composeart-f9a7a',
@@ -29,7 +28,12 @@ const reUpdateFighterRankings = async () => {
 const setupTournament = async () => {
   console.log("setupTournament began.");
   try {
-    await scheduleSeasonForBlock(db, "6361641");
+    await db
+      .collection('nft-death-games')
+      .doc('season_0')
+      .update({
+        startSeason: true
+      });
     console.log("setupTournament succeeded.");
   } catch (error) {
     console.error(`setupTournament failed, error: ${error}`);
@@ -39,7 +43,7 @@ const setupTournament = async () => {
 const runTestDataSetup = async () => {
   console.log("--- BEGINNING TOURNAMENT TEST ---");
   await reUpdateFighterRankings();
-  delay(1000);
+  delay(5000);
   await setupTournament();
   console.log("--- END TOURNAMENT TEST ---\n\n");
 }

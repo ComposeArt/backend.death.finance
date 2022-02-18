@@ -1,6 +1,26 @@
 import _ from 'lodash';
 import { ICumulativeStats } from './matches/matches';
 import { addCumulativeStats } from './collection';
+import { scheduleTournamentsWithStartingBlock } from './tournament';
+import { emulatorLog } from './utils';
+
+export const startSeason = async (season: any, db: any) => {
+  try {
+    const goerliSnap = await db.collection('chains').doc('goerli').get();
+    const blockNumber = goerliSnap.data().blockNumber;
+
+    emulatorLog(`Starting season ${season.id} on block ${blockNumber}.`)
+
+    await scheduleTournamentsWithStartingBlock(db, blockNumber)
+    await db
+      .collection('nft-death-games')
+      .doc(season.id).update({
+        startSeason: false,
+      });
+  } catch (error) {
+    console.error(`startSeason error ${error}.`)
+  }
+};
 
 export const updateCumulativeSeasonStats = async (seasonId: string, db: any) => {
   const seasonPath = db
@@ -46,13 +66,13 @@ export const updateFighterRankings = async (seasonId: string, db: any) => {
         .sort(compareFighters)
         .map(async (fighter: any, index: number) => {
           return await seasonPath
-          .collection('fighters')
+            .collection('fighters')
             .doc(fighter.id)
             .update({
               ranking: index
             });
         }));
-    await seasonPath.update({updateFighterRankings: false});
+    await seasonPath.update({ updateFighterRankings: false });
   } catch (error) {
     console.error(error);
     throw new Error(`updateFighterRankings failed ${error}`);

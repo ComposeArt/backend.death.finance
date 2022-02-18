@@ -24,7 +24,7 @@ const isFightingBlock = (blockNumber: string): boolean => {
   return _.floor(parseInt(blockNumber, 10) / 10 % 2) === 1;
 };
 
-export const scheduleSeasonForBlock = async (
+export const scheduleTournamentsWithStartingBlock = async (
   db: any,
   blockNumber: string
 ) => {
@@ -33,7 +33,7 @@ export const scheduleSeasonForBlock = async (
     await scheduleTournamentFirstBrackets(db, block);
     await scheduleTournamentFinalistBrackets(db, block);
   } catch (error) {
-    console.error(`scheduleSeasonForBlock error ${error}`);
+    console.error(`scheduleTournamentsWithStartingBlock error ${error}`);
   }
 };
 
