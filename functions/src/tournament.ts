@@ -3,6 +3,26 @@ import { getPerFighterMatchStats } from './matches/matchesUtils';
 import { moveFighterToMatch } from './tournamentMatch';
 import { emulatorLog } from './utils';
 
+let seasonId: string;
+
+// -- ENTRY POINT --
+export const scheduleTournamentsWithStartingBlock = async (
+  db: any,
+  season: any,
+  blockNumber: string
+) => {
+  seasonId = season.id;
+  const block = increasedToNextFightingBlock(blockNumber);
+  try {
+    await scheduleTournamentFirstBrackets(db, block);
+    await scheduleTournamentFinalistBrackets(db, block);
+  } catch (error) {
+    console.error(`scheduleTournamentsWithStartingBlock error ${error}`);
+  }
+};
+
+// -- END ENTRY POINT --
+
 /*
 -- Example 128 Fighter Bracket --
 Round of 64 (a, 32 matchups) - zeta   \
@@ -24,19 +44,6 @@ const isFightingBlock = (blockNumber: string): boolean => {
   return _.floor(parseInt(blockNumber, 10) / 10 % 2) === 1;
 };
 
-export const scheduleTournamentsWithStartingBlock = async (
-  db: any,
-  blockNumber: string
-) => {
-  const block = increasedToNextFightingBlock(blockNumber);
-  try {
-    await scheduleTournamentFirstBrackets(db, block);
-    await scheduleTournamentFinalistBrackets(db, block);
-  } catch (error) {
-    console.error(`scheduleTournamentsWithStartingBlock error ${error}`);
-  }
-};
-
 const addedNumberToBlock = (blockNumber: string, numberToAdd: number): string => {
   return (parseInt(blockNumber, 10) + numberToAdd).toString();
 };
@@ -50,7 +57,7 @@ export const scheduleTournamentFirstBrackets = async (
   blockNumber: string,
 ) => {
   const fighters = await getAllFightersRankedOrder(db);
-  const {firstHalf, secondHalf} = inHalf(fighters);
+  const { firstHalf, secondHalf } = inHalf(fighters);
   const paired = zip(firstHalf, secondHalf);
 
   /*
@@ -121,7 +128,7 @@ const zip = (left: any[], right: any[]): any[] => {
 
 const getAllFightersRankedOrder = async (db: any) => {
   const snapshot = await db.collection('nft-death-games')
-    .doc('season_0')
+    .doc(seasonId)
     .collection('fighters')
     .where('is_doping', '==', false)
     .where('is_invalid', '==', false)
@@ -136,15 +143,7 @@ const inHalf = (array: any[]): any => {
 
   const firstHalf = array.slice(0, midIndex);
   const secondHalf = array.slice(-midIndex).reverse();
-  return {firstHalf, secondHalf};
-};
-
-const tournamentPath = (db: any) => {
-  return db.collection('nft-death-games').doc('season_0').collection('tournament');
-};
-
-const fightsPath = (db: any) => {
-  return db.collection('nft-death-games').doc('season_0').collection('fights');
+  return { firstHalf, secondHalf };
 };
 
 export const runFightsForBlock = async (
@@ -300,7 +299,7 @@ export const scheduleFightsForTournamentMatchup = async (
 
       await db
         .collection('nft-death-games')
-        .doc('season_0')
+        .doc(seasonId)
         .collection('fights')
         .doc(id)
         .create(fight);
@@ -308,10 +307,6 @@ export const scheduleFightsForTournamentMatchup = async (
   } catch (error) {
     console.error(`scheduleFightsForTournamentMatchup error ${error}`);
   }
-};
-
-const seasonPath = (db: any) => {
-  return db.collection('nft-death-games').doc('season_0');
 };
 
 export const updateStatsForFightResult = async (
@@ -373,4 +368,16 @@ const moveFighterToNextRoundMatch = async (db: any, fighter: any, matchFighterWo
   const matchId = `${nextRound}-${nextSlot}`;
   emulatorLog(`Moving fighter ${fighter.id} to the next round: ${matchId}.`);
   await moveFighterToMatch(db, fighter, matchFighterWon, matchFighterWon.bracket, matchId);
+};
+
+const seasonPath = (db: any) => {
+  return db.collection('nft-death-games').doc(seasonId);
+};
+
+const tournamentPath = (db: any) => {
+  return seasonPath(db).collection('tournament');
+};
+
+const fightsPath = (db: any) => {
+  return seasonPath(db).collection('fights');
 };

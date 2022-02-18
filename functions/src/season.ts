@@ -9,16 +9,16 @@ export const startSeason = async (season: any, db: any) => {
     const goerliSnap = await db.collection('chains').doc('goerli').get();
     const blockNumber = goerliSnap.data().blockNumber;
 
-    emulatorLog(`Starting season ${season.id} on block ${blockNumber}.`)
+    emulatorLog(`Starting season ${season.id} on block ${blockNumber}.`);
 
-    await scheduleTournamentsWithStartingBlock(db, blockNumber)
+    await scheduleTournamentsWithStartingBlock(db, season, blockNumber);
     await db
       .collection('nft-death-games')
       .doc(season.id).update({
         startSeason: false,
       });
   } catch (error) {
-    console.error(`startSeason error ${error}.`)
+    console.error(`startSeason error ${error}.`);
   }
 };
 
