@@ -11,7 +11,7 @@ export const updateGoerli = async (admin: any) => {
 
     for (const t of times) {
       const db = admin.firestore();
-      const contractAddress = '0x463146588e0c6E6899A9140D9DB488B2354E3775';
+      const contractAddress = functions.config().app.contract_address;
 
       const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
       const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);

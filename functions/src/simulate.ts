@@ -15,11 +15,7 @@ export const getFightClubContract = async (db: any) => {
   const signer = wallet.connect(infuraProvider);
 
   try {
-    const goerli = await db.collection('chains')
-      .doc('goerli')
-      .get();
-
-    const address = goerli.data().contractAddress;
+    const address = functions.config().app.contract_address;
     const fightClub = new ethers.Contract(
       address,
       FightClub.abi,
