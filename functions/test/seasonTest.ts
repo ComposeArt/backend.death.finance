@@ -17,6 +17,7 @@ const setupSeason = async () => {
       id: 'season_0',
       updateFighterRankings: false,
       registrationClosed: false,
+      startSeason: false,
     });
     await path.update({
       updateFighterRankings: true

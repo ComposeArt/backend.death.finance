@@ -548,6 +548,10 @@ export const updateSeason = async (change: any, admin: any) => {
     if (!previous.updateFighterRankings && updatedSeason.updateFighterRankings) {
       await seasonFunctions.updateFighterRankings(updatedSeason.id, db);
     }
+
+    if (!previous.startSeason && updatedSeason.startSeason) {
+      await seasonFunctions.startSeason(updatedSeason, db);
+    }
   } catch (error) {
     console.error(error);
   }
