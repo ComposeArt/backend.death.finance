@@ -35,6 +35,8 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
     .collection('matches')
     .where('block', '<=', String(blockNumber))
     .where('log', '==', '')
+    .orderBy('block', 'desc')
+    .limit(500)
     .get();
 
   return matches;
