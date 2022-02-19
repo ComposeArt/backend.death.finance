@@ -33,7 +33,8 @@ export const getMatchesForBlock = async (db: any, blockNumber: number) => {
     .collection('nft-death-games')
     .doc('season_0')
     .collection('matches')
-    .where('block', '==', String(blockNumber))
+    .where('block', '<=', String(blockNumber))
+    .where('log', '==', '')
     .get();
 
   return matches;
