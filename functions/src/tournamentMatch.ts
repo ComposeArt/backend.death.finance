@@ -13,7 +13,7 @@ const seasonPath = (db: any) => {
 
 export const handleUpdatedTournamentMatch = (db: any, match: any) => {
   if (tournamentMatchIsCompleted(match) && match.isFinalMatchForTournament) {
-    console.log(`updateFighterStatsForMatch final match complete in tournament ${match.bracketName}, ID ${match.id}.`);
+    console.log(`updateFighterStatsForMatch final match complete in tournament ${match.bracket}, ID ${match.id}.`);
     if (match.bracket === 'omega') {
       // season winner
     } else {
@@ -49,9 +49,9 @@ export const moveFighterToNextTournamentMatch = async (db: any, fighter: any, ma
 
   let nextSlot = Math.floor(matchFighterWon.slot / 2);
 
-  // sigma is the sweet 16. zeta feeds into the top 8 slots (0 through 7). theta into the bottom 8 slots (8 through 15).
+  // sigma is the sweet 16. zeta feeds into the top 4 slots (fighters 0 through 7). theta into the bottom 4 slots (fighters 8 through 15).
   if (tournament === 'theta') {
-    nextSlot += 8;
+    nextSlot += 4;
   }
 
   const matchId = `0-${nextSlot}`;
@@ -103,6 +103,8 @@ export const moveFighterToMatch = async (
       });
     }
 
+    const fightPromises: any = [];
+
     // Assign fighter object to new fights.
     for (let i = 0; i < newMatch.best_of; i++) {
       const fightPath = seasonPath(db)
@@ -110,17 +112,23 @@ export const moveFighterToMatch = async (
         .doc(`${tournament}-${newMatchId}-${i}`);
 
       if (upperSlot) {
-        await fightPath
-          .update({
-            fighter1: fighter
-          });
+        fightPromises.push(
+          fightPath
+            .update({
+              fighter1: fighter
+            })
+        );
       } else {
-        await fightPath
-          .update({
-            fighter2: fighter
-          });
+        fightPromises.push(
+          fightPath
+            .update({
+              fighter2: fighter
+            })
+        );
       }
     }
+
+    await Promise.all(fightPromises);
   } catch (error) {
     console.error(`moveFighterToNextTournament failed with error ${error}`);
   }

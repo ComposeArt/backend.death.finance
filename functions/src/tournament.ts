@@ -48,7 +48,7 @@ const addedNumberToBlock = (blockNumber: string, numberToAdd: number): string =>
 There are ~6500 blocks every day. We want about 2 hours between rounds, which is 270 blocks.
 */
 const twoHoursOfBlocks = 20;
-const dayOFBlocks = 20;
+const dayOFBlocks = 60;
 
 export const scheduleTournamentFirstBrackets = async (
   db: any,
@@ -109,11 +109,11 @@ export const scheduleTournamentFinalistBrackets = async (
   We want our finalist rounds, sigma and omega, to start the following day at approximately the same time.
   */
   const sigmaStart = addedNumberToBlock(firstRoundBlockStart, dayOFBlocks);
-  const sigmaSize = 16;
+  const sigmaMatchSize = 8;
 
-  await scheduleEmptyBracket(db, 'sigma', 5, sigmaSize, sigmaStart, 0, false);
-  await scheduleEmptyBracket(db, 'sigma', 5, sigmaSize / 2, addedNumberToBlock(sigmaStart, twoHoursOfBlocks), 1, false);
-  await scheduleEmptyBracket(db, 'sigma', 5, sigmaSize / 4, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 2), 2, true);
+  await scheduleEmptyBracket(db, 'sigma', 5, sigmaMatchSize, sigmaStart, 0, false);
+  await scheduleEmptyBracket(db, 'sigma', 5, sigmaMatchSize / 2, addedNumberToBlock(sigmaStart, twoHoursOfBlocks), 1, false);
+  await scheduleEmptyBracket(db, 'sigma', 5, sigmaMatchSize / 4, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 2), 2, true);
 
   await scheduleEmptyBracket(db, 'omega', 7, 1, addedNumberToBlock(sigmaStart, twoHoursOfBlocks * 3), 0, true);
 };
