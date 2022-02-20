@@ -91,8 +91,7 @@ export const moveFighterToMatch = async (
     For the next round, we always want the winner of c-d to be slotted into player2, and winner of a-b into player1.
     */
 
-    // const wasUpperSlot = matchFighterWon.slot % 2 === 0;
-    const upperSlot = (Math.floor(matchFighterWon.slot / 2) % 2) === 0;
+    const upperSlot = matchFighterWon.slot % 2 === 0;
     // Assign fighter object to new match.
     if (upperSlot) {
       await matchPath.update({
