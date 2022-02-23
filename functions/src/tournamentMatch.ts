@@ -11,13 +11,13 @@ const seasonPath = (db: any) => {
   return db.collection('nft-death-games').doc('season_0');
 };
 
-export const handleUpdatedTournamentMatch = (db: any, match: any) => {
+export const handleUpdatedTournamentMatch = async (db: any, match: any) => {
   if (tournamentMatchIsCompleted(match) && match.isFinalMatchForTournament) {
     console.log(`updateFighterStatsForMatch final match complete in tournament ${match.bracket}, ID ${match.id}.`);
     if (match.bracket === 'omega') {
       // season winner
     } else {
-      moveFighterToNextTournamentMatch(db, winnerFromTournamentMatch(match), match);
+      await moveFighterToNextTournamentMatch(db, winnerFromTournamentMatch(match), match);
     }
   }
 };

@@ -560,7 +560,7 @@ export const updateSeason = async (change: any, admin: any) => {
 export const updateTournamentMatch = async (change: any, admin: any) => {
   const match = change.after.data();
   const db = admin.firestore();
-  tournamentMatchFunctions.handleUpdatedTournamentMatch(db, match);
+  await tournamentMatchFunctions.handleUpdatedTournamentMatch(db, match);
 };
 
 export const updateFight = async (change: any, admin: any) => {

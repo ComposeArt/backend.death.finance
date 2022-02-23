@@ -346,7 +346,7 @@ export const updateStatsForFightResult = async (
 
     if (fight.isFinalFight) {
       const fighter1WonMatch = newFighter1Wins > newFighter2Wins;
-      moveFighterToNextRoundMatch(db, fighter1WonMatch ? match.fighter1 : match.fighter2, match);
+      await moveFighterToNextRoundMatch(db, fighter1WonMatch ? match.fighter1 : match.fighter2, match);
     }
   } catch (error) {
     console.error(`updateStatsForFightResult error ${error}`);
