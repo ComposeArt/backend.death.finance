@@ -10,7 +10,92 @@ import * as collectionFunctions from './collection';
 import * as seasonFunctions from './season';
 import * as tournamentFunctions from './tournament';
 import * as tournamentMatchFunctions from './tournamentMatch';
+import * as discordFunctions from './discord';
 import { emulatorLog } from './utils';
+
+export const createCommand = async (snap: any, admin: any) => {
+  const db = admin.firestore();
+  const command = snap.data();
+
+  try {
+    if (command.type === 'fight') {
+      let content = '';
+
+      let player1 = {};
+      let player2 = {};
+
+      const player1Docs = await db.collection('collections')
+        .doc(command.collection1)
+        .collection('players')
+        .where('token_id', '==', command.token1)
+        .get();
+
+      player1Docs.forEach((player1Doc: any) => {
+        player1 = player1Doc.data();
+      });
+
+      if (_.isEmpty(player1)) {
+        content = 'fighter 1 is invalid!';
+      }
+
+      const player2Docs = await db.collection('collections')
+        .doc(command.collection2)
+        .collection('players')
+        .where('token_id', '==', command.token2)
+        .get();
+
+      player2Docs.forEach((player2Doc: any) => {
+        player2 = player2Doc.data();
+      });
+
+      if (_.isEmpty(player2)) {
+        content = 'fighter 2 is invalid!';
+      }
+
+      if (!_.isEmpty(player1) && !_.isEmpty(player2)) {
+        content = 'all fighters are valid';
+      }
+
+      await discordFunctions.updateMessage({
+        application_id: command.application_id,
+        token: command.token,
+        content,
+      });
+    }
+
+    if (command.type === 'refresh') {
+      const collectionDoc = await db.collection('collections').doc(command.collection).get();
+
+      let content = '';
+
+      if (collectionDoc.exists) {
+        content = `refresh for ${command.collection} complete`;
+      } else {
+        content = `${command.collection} is not a valid collection!`;
+      }
+
+      await discordFunctions.updateMessage({
+        application_id: command.application_id,
+        token: command.token,
+        content,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateCommand = async (change: any, admin: any) => {
+  const db = admin.firestore();
+  const oldCommand = change.before.data();
+  const command = change.after.data();
+
+  // try {
+
+  // } catch (error) {
+  //   console.error(error);
+  // }
+};
 
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();

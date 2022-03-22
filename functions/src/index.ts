@@ -5,6 +5,7 @@ import * as simulateFunctions from './simulate';
 import * as registrationFunctions from './registration';
 import * as scheduleFunctions from './scheduled';
 import * as triggerFunctions from './triggers';
+import * as discordFunctions from './discord';
 
 admin.initializeApp(functions.config().firebase);
 
@@ -76,6 +77,14 @@ export const onUpdateTournamentMatch = firebaseFunction.firestore
   .document('nft-death-games/{seasonId}/tournament/{tournamentId}/matches/{matchId}')
   .onUpdate(async (change, context) => await triggerFunctions.updateTournamentMatch(change, admin));
 
+export const onCreateCommand = firebaseFunction.firestore
+  .document('commands/{id}')
+  .onCreate(async (snap, context) => await triggerFunctions.createCommand(snap, admin));
+
+export const onUpdateCommand = firebaseFunction.firestore
+  .document('commands/{id}')
+  .onUpdate(async (change, context) => await triggerFunctions.updateCommand(change, admin));
+
 // ------------------ //
 //      CALLABLE      //
 // ------------------ //
@@ -94,3 +103,10 @@ export const registerFighter = firebaseFunction.https
 
 export const getAddressNFTs = firebaseFunction.https
   .onCall((params, context) => registrationFunctions.getAddressNFTs(admin, params, context));
+
+// ------------------ //
+//       https        //
+// ------------------ //
+
+exports.discord = firebaseFunction.https
+  .onRequest((request, response) => discordFunctions.handle(admin, request, response));
