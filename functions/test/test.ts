@@ -6,14 +6,20 @@ import { ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/match
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
 import { getPerFighterMatchStats } from "../src/matches/matchesUtils";
+import { discordFight } from "../src/simulate";
+import { firebaseConfig } from "firebase-functions";
+import admin from 'firebase-admin';
 
-const app = initializeApp({
-  apiKey: 'AIzaSyBK-EdRy8HJWm9LiMeLPr-q_kBTfSfTcVY',
-  authDomain: 'composeart-f9a7a.firebaseapp.com',
-  projectId: 'composeart-f9a7a',
+const serviceAccountProd = require('../../serviceAccountKey.json');
+const runTimeConfig = require('../../.runtimeconfig.json');
+
+
+const app = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccountProd),
   databaseURL: 'https://composeart-f9a7a.firebaseio.com',
 });
 
+/*
 const functions = getFunctions(app);
 connectFunctionsEmulator(functions, "localhost", 5001);
 const simulateMatchStatsFighter2Fucked = () => {
@@ -47,6 +53,7 @@ const simulateMatchStatsFighter2Fucked = () => {
     f2);
   console.log(`simulateMatchStatsPlayer2Fucked results: ${JSON.stringify(result)}\n`);
 };
+*/
 
 const simulateMatchStatsTieDyeOnTieDyeViolence = () => {
   // Copy of match https://death.finance/simulator/5FKEqMBjxoBa0GEhnoKv
@@ -231,15 +238,33 @@ const rankFighters = () => {
   console.log(`rankFighters order is now: ${ids}`);
 };
 
+const db = admin.firestore();
+const fightParams = {
+  db,
+  infura: runTimeConfig.infura.id,
+  privateKey: runTimeConfig.ethereum.deployer_private_key,
+  isSimulated: true,
+  token1: "3001",
+  collection1: "monster-satoshibles",
+  token2: "3002",
+  collection2: "monster-satoshibles",
+  random: 10,
+  blockNumber: 6583056
+}
+
 const runTests = async () => {
   console.log("--- BEGINNING MAINTEST ---");
-  await simulateMatchStatsFighter2Fucked();
+  //await simulateMatchStatsFighter2Fucked();
   await simulateMatchStatsTieDyeOnTieDyeViolence();
   await totalFighterStats();
   await totalCollectionStats();
   rankFighters();
+
+  const result = await discordFight(fightParams);
+  console.log("\n\n" + JSON.stringify(result) + "\n\n");
   console.log("--- END MAINTEST ---\n\n");
 }
+
 runTests();
 
 // Randomness Example

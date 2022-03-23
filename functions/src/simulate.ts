@@ -116,7 +116,7 @@ export const simulateFight = async (
       const signer = wallet.connect(infuraProvider);
 
       const fightClub = new ethers.Contract(
-        '0x463146588e0c6E6899A9140D9DB488B2354E3775',
+        '0xb66465235eD7b96306CeE64eE84f195209953225',
         FightClub.abi,
         signer
       );
@@ -275,5 +275,72 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
 
   if (discordResult.status !== 204) {
     throw new Error(`Request to Discord failed`);
+  }
+};
+
+export const discordFight = async ({
+  db,
+  infura,
+  privateKey,
+  isSimulated,
+  token1,
+  collection1,
+  token2,
+  collection2,
+  random,
+  blockNumber
+}: any) => {
+  try {
+
+    let player1: any = {};
+    let player2: any = {};
+
+    const player1Docs = await db.collection('collections')
+      .doc(collection1)
+      .collection('players')
+      .where('token_id', '==', token1)
+      .get();
+
+    player1Docs.forEach((player1Doc: any) => {
+      player1 = player1Doc.data();
+    });
+
+    const player2Docs = await db.collection('collections')
+      .doc(collection2)
+      .collection('players')
+      .where('token_id', '==', token2)
+      .get();
+
+    player2Docs.forEach((player2Doc: any) => {
+      player2 = player2Doc.data();
+    });
+
+    if (!_.isEmpty(player1) && !_.isEmpty(player2)) {
+      const infuraProvider = new ethers.providers.InfuraProvider('goerli', infura);
+      const wallet = new ethers.Wallet(`${privateKey}`, infuraProvider);
+      const signer = wallet.connect(infuraProvider);
+
+      const fightClub = new ethers.Contract(
+        '0xb66465235eD7b96306CeE64eE84f195209953225',
+        FightClub.abi,
+        signer
+      );
+      let eventLog = await fightClub.fight(isSimulated, player1.binary_power, player2.binary_power, random, blockNumber);
+      eventLog = BigInt((eventLog).toString().replace('.', '')).toString(2);
+      const currentBlock = isSimulated ? blockNumber : (await infuraProvider.getBlock(await infuraProvider.getBlockNumber())).number;
+      const randomness = isSimulated ? random : (await fightClub.getRandomness()).toString();
+
+      return {
+        eventLog,
+        blockNumber: currentBlock.toString(),
+        randomness: randomness.toString(),
+      };
+    } else {
+      throw new Error('invalid fighters');
+    }
+  } catch (error) {
+    const msg = getErrorMessage(error);
+
+    throw new functions.https.HttpsError('internal', msg || 'simulation failed');
   }
 };
