@@ -20,7 +20,7 @@ export const createCommand = async (snap: any, admin: any) => {
   try {
     if (command.type === 'fight') {
       try {
-        const result = await simulateFunctions.discordFight({
+        const fightPayload = {
           db,
           infura: functions.config().infura.id,
           privateKey: functions.config().ethereum.deployer_private_key,
@@ -31,12 +31,27 @@ export const createCommand = async (snap: any, admin: any) => {
           collection2: command.collection2,
           random: 10,
           blockNumber: 6583056
-        });
+        };
+        const result = await simulateFunctions.discordFight(fightPayload);
+
         await discordFunctions.updateMessage({
           application_id: command.application_id,
           token: command.token,
           content: JSON.stringify(result),
         });
+
+        const embeds = await simulateFunctions.buildPreFight(fightPayload);
+        const discordResult = await fetch('https://discord.com/api/webhooks/956587116891103264/d_zccFy2aHHI_OhYGURMSosQdq0iwT3toBEPN-pV-4Ms6p4egGpER4nji8jX6qQfYLYf', {
+          method: 'POST',
+          body: JSON.stringify(embeds),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        
+
+
       } catch (error) {
         await discordFunctions.updateMessage({
           application_id: command.application_id,

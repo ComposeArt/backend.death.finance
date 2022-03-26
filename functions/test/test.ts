@@ -6,9 +6,11 @@ import { ICumulativeStats, cumulativeStatsFromArray } from "../src/matches/match
 import { addCumulativeStats } from "../src/collection";
 import { compareFighters } from "../src/season";
 import { getPerFighterMatchStats } from "../src/matches/matchesUtils";
-import { discordFight } from "../src/simulate";
+import { buildPreFight, discordFight } from "../src/simulate";
 import { firebaseConfig } from "firebase-functions";
 import admin from 'firebase-admin';
+import fetch from 'node-fetch';
+import * as discordFunctions from '../src/discord';
 
 const serviceAccountProd = require('../../serviceAccountKey.json');
 const runTimeConfig = require('../../.runtimeconfig.json');
@@ -238,6 +240,9 @@ const rankFighters = () => {
   console.log(`rankFighters order is now: ${ids}`);
 };
 
+
+
+
 const db = admin.firestore();
 const fightParams = {
   db,
@@ -262,6 +267,22 @@ const runTests = async () => {
 
   const result = await discordFight(fightParams);
   console.log("\n\n" + JSON.stringify(result) + "\n\n");
+
+  const result2 = await buildPreFight(fightParams);
+  try {
+    
+    const discordResult = await fetch('https://discord.com/api/webhooks/956587116891103264/d_zccFy2aHHI_OhYGURMSosQdq0iwT3toBEPN-pV-4Ms6p4egGpER4nji8jX6qQfYLYf', {
+    method: 'POST',
+    body: JSON.stringify(result2),
+    headers: {
+      'Content-Type': 'application/json'
+      }
+    });
+    console.log("\n\n" + JSON.stringify(discordResult) + "\n\n");
+  } catch {
+    console.log("\n\nsomethings gone wrong\n\n");
+  }
+  
   console.log("--- END MAINTEST ---\n\n");
 }
 

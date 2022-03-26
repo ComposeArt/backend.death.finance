@@ -9,6 +9,7 @@ import nodeHtmlToImage from 'node-html-to-image';
 import FightClub from './FightClub.json';
 import { emulatorLog } from './utils';
 
+
 export const getFightClubContract = async (db: any) => {
   const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
   const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
@@ -278,20 +279,23 @@ const logMatchOutcomeToDiscord = async (db: any, matchId: any, fightLog: any) =>
   }
 };
 
-export const discordFight = async ({
-  db,
-  infura,
-  privateKey,
-  isSimulated,
-  token1,
-  collection1,
-  token2,
-  collection2,
-  random,
-  blockNumber
-}: any) => {
+export interface IFightParams {
+  db: any;
+  infura: any;
+  privateKey: string;
+  isSimulated: boolean;
+  token1: string;
+  collection1: string;
+  token2: string;
+  collection2: string;
+  random: number;
+  blockNumber: number;
+}
+
+export const discordFight = async (params: IFightParams) => {
   try {
 
+    const {db, infura, privateKey, isSimulated, token1, collection1, token2, collection2, random, blockNumber} = params;
     let player1: any = {};
     let player2: any = {};
 
@@ -314,6 +318,9 @@ export const discordFight = async ({
     player2Docs.forEach((player2Doc: any) => {
       player2 = player2Doc.data();
     });
+
+    // testing parse
+    console.log(JSON.stringify(player1));
 
     if (!_.isEmpty(player1) && !_.isEmpty(player2)) {
       const infuraProvider = new ethers.providers.InfuraProvider('goerli', infura);
@@ -343,4 +350,78 @@ export const discordFight = async ({
 
     throw new functions.https.HttpsError('internal', msg || 'simulation failed');
   }
+};
+
+export const buildPreFight = async (params: IFightParams) => {
+  const {db, infura, privateKey, isSimulated, token1, collection1, token2, collection2, random, blockNumber} = params;
+  let player1: any = {};
+  let player2: any = {};
+
+  const player1Docs = await db.collection('collections')
+    .doc(collection1)
+    .collection('players')
+    .where('token_id', '==', token1)
+    .get();
+
+  player1Docs.forEach((player1Doc: any) => {
+    player1 = player1Doc.data();
+  });
+
+  const player2Docs = await db.collection('collections')
+    .doc(collection2)
+    .collection('players')
+    .where('token_id', '==', token2)
+    .get();
+
+  player2Docs.forEach((player2Doc: any) => {
+    player2 = player2Doc.data();
+  });
+
+  const attackResult: any = player1.attack > player2.attack ? {outcome: 'win', trait: 'attack'} : {outcome: 'loss', trait: 'attack'};
+  const defenseResult: any  = player1.defense > player2.defense ? {outcome: 'win', trait: 'defense'} : {outcome: 'loss', trait: 'defense'};
+  const healthResult: any = player1.health > player2.health ? {outcome: 'win', trait: 'health'} : {outcome: 'loss', trait: 'health'};
+  const powerResult: any  = player1.power > player2.power ? {outcome: 'win', trait: 'power'} : {outcome: 'loss', trait: 'power'};
+  const specialAttackResult: any = player1.special_attack > player2.special_attack ?
+  {outcome: 'win', trait: 'special_attack'} : {outcome: 'loss', trait: 'special_attack'};
+  const specialElementResult: any = player1.special_element > player2.special_element ?
+  {outcome: 'win', trait: 'special_element'} : {outcome: 'loss', trait: 'special_element'};
+  let wins = '';
+  let losses = '';
+  const relevantResults = [attackResult, defenseResult, healthResult, powerResult, specialAttackResult, specialElementResult];
+
+  for (const comparison of relevantResults) {
+    if (comparison.outcome === 'win') {
+      wins += `${comparison.trait}, `;
+    } else {
+      losses += `${comparison.trait}, `;
+    }
+  }
+
+  losses = losses.length === 0 ? losses = 'None' : losses = losses.slice(0, -2);
+  wins = wins.length === 0 ? wins = 'None' : wins = wins.slice(0, -2);
+
+  const formatting = '```';
+
+  const result = {
+    content: `Fight ${player1.token_id} vs ${player2.token_id} initiated by ${player1.token_id}(@ user here)`,
+    embeds: [
+      {
+        title: player1.token_id,
+        color: 5814783,
+        fields: [
+          {
+            name: 'Relative Strengths',
+            value: `${formatting}ini\n[${wins}]\n${formatting}`,
+          },
+          {
+            name: 'Relative Weaknesses',
+            value: `${formatting}css\n[${losses}]\n${formatting}`,
+          }
+        ]
+      }
+    ]
+  };
+
+  return result;
+
 };
