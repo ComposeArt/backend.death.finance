@@ -39,19 +39,6 @@ export const createCommand = async (snap: any, admin: any) => {
           token: command.token,
           content: JSON.stringify(result),
         });
-
-        const embeds = await simulateFunctions.buildPreFight(fightPayload);
-        const discordResult = await fetch('https://discord.com/api/webhooks/956587116891103264/d_zccFy2aHHI_OhYGURMSosQdq0iwT3toBEPN-pV-4Ms6p4egGpER4nji8jX6qQfYLYf', {
-          method: 'POST',
-          body: JSON.stringify(embeds),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        
-
-
       } catch (error) {
         await discordFunctions.updateMessage({
           application_id: command.application_id,
@@ -78,9 +65,41 @@ export const createCommand = async (snap: any, admin: any) => {
         content,
       });
     }
+    if (command.type === 'preview' ) {
+      try {
+        const fightPayload = {
+          db,
+          infura: functions.config().infura.id,
+          privateKey: functions.config().ethereum.deployer_private_key,
+          isSimulated: true,
+          token1: command.token1,
+          collection1: command.collection1,
+          token2: command.token2,
+          collection2: command.collection2,
+          random: 10,
+          blockNumber: 6583056
+        };
+        const embeds = await simulateFunctions.buildPreFight(fightPayload);
+        await fetch(`https://discord.com/api/webhooks/${command.application_id}/${command.token}`, {
+          method: 'POST',
+          body: JSON.stringify(embeds),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+      } catch (error) {
+        await discordFunctions.updateMessage({
+          application_id: command.application_id,
+          token: command.token,
+          content: 'preview failed',
+        });
+      }
+    }
   } catch (error) {
     console.error(error);
   }
+
 };
 
 export const updateCommand = async (change: any, admin: any) => {
@@ -88,13 +107,12 @@ export const updateCommand = async (change: any, admin: any) => {
   const oldCommand = change.before.data();
   const command = change.after.data();
 
-  // try {
-
-  // } catch (error) {
-  //   console.error(error);
-  // }
+  try {
+    console.log('doing something');
+  } catch (error) {
+    console.error(error);
+  }
 };
-
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
   const match = snap.data();

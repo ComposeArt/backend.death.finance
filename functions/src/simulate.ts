@@ -9,7 +9,6 @@ import nodeHtmlToImage from 'node-html-to-image';
 import FightClub from './FightClub.json';
 import { emulatorLog } from './utils';
 
-
 export const getFightClubContract = async (db: any) => {
   const infuraProvider = new ethers.providers.InfuraProvider('goerli', functions.config().infura.id);
   const wallet = new ethers.Wallet(`${functions.config().ethereum.deployer_private_key}`, infuraProvider);
@@ -403,7 +402,7 @@ export const buildPreFight = async (params: IFightParams) => {
   const formatting = '```';
 
   const result = {
-    content: `Fight ${player1.token_id} vs ${player2.token_id} initiated by ${player1.token_id}(@ user here)`,
+    content: `Fight ${player1.token_id} vs ${player2.token_id} initiated by ${player1.token_id}`,
     embeds: [
       {
         title: player1.token_id,

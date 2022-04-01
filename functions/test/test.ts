@@ -269,8 +269,9 @@ const runTests = async () => {
   console.log("\n\n" + JSON.stringify(result) + "\n\n");
 
   const result2 = await buildPreFight(fightParams);
+
+  console.log(JSON.stringify(result2))
   try {
-    
     const discordResult = await fetch('https://discord.com/api/webhooks/956587116891103264/d_zccFy2aHHI_OhYGURMSosQdq0iwT3toBEPN-pV-4Ms6p4egGpER4nji8jX6qQfYLYf', {
     method: 'POST',
     body: JSON.stringify(result2),
@@ -278,7 +279,7 @@ const runTests = async () => {
       'Content-Type': 'application/json'
       }
     });
-    console.log("\n\n" + JSON.stringify(discordResult) + "\n\n");
+    //console.log("\n\n" + JSON.stringify(discordResult) + "\n\n");
   } catch {
     console.log("\n\nsomethings gone wrong\n\n");
   }
