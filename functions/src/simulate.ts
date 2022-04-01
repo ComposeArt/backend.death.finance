@@ -318,9 +318,6 @@ export const discordFight = async (params: IFightParams) => {
       player2 = player2Doc.data();
     });
 
-    // testing parse
-    console.log(JSON.stringify(player1));
-
     if (!_.isEmpty(player1) && !_.isEmpty(player2)) {
       const infuraProvider = new ethers.providers.InfuraProvider('goerli', infura);
       const wallet = new ethers.Wallet(`${privateKey}`, infuraProvider);

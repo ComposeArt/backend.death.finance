@@ -106,12 +106,6 @@ export const updateCommand = async (change: any, admin: any) => {
   const db = admin.firestore();
   const oldCommand = change.before.data();
   const command = change.after.data();
-
-  try {
-    console.log('doing something');
-  } catch (error) {
-    console.error(error);
-  }
 };
 export const createMatch = async (snap: any, admin: any) => {
   const db = admin.firestore();
