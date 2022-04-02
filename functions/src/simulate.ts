@@ -378,9 +378,9 @@ export const buildPreFight = async (params: IFightParams) => {
   const healthResult: any = player1.health > player2.health ? {outcome: 'win', trait: 'health'} : {outcome: 'loss', trait: 'health'};
   const powerResult: any  = player1.power > player2.power ? {outcome: 'win', trait: 'power'} : {outcome: 'loss', trait: 'power'};
   const specialAttackResult: any = player1.special_attack > player2.special_attack ?
-  {outcome: 'win', trait: 'special_attack'} : {outcome: 'loss', trait: 'special_attack'};
+    {outcome: 'win', trait: 'special_attack'} : {outcome: 'loss', trait: 'special_attack'};
   const specialElementResult: any = player1.special_element > player2.special_element ?
-  {outcome: 'win', trait: 'special_element'} : {outcome: 'loss', trait: 'special_element'};
+    {outcome: 'win', trait: 'special_element'} : {outcome: 'loss', trait: 'special_element'};
   let wins = '';
   let losses = '';
   const relevantResults = [attackResult, defenseResult, healthResult, powerResult, specialAttackResult, specialElementResult];
@@ -393,8 +393,8 @@ export const buildPreFight = async (params: IFightParams) => {
     }
   }
 
-  losses = losses.length === 0 ? losses = 'None' : losses = losses.slice(0, -2);
-  wins = wins.length === 0 ? wins = 'None' : wins = wins.slice(0, -2);
+  losses = losses.length === 0 ? 'None' : losses.slice(0, -2);
+  wins = wins.length === 0 ? 'None' : wins.slice(0, -2);
 
   const formatting = '```';
 
