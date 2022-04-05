@@ -108,6 +108,29 @@ export const handle = async (admin: any, request: any, response: any) => {
             content: `3, 2, 1 Let's dance...`,
           },
         });
+      } else if (action === 'preview') {
+        const collection1 = message.data.options[0].value;
+        const token1 = message.data.options[1].value;
+        const collection2 = message.data.options[2].value;
+        const token2 = message.data.options[3].value;
+
+        await db.collection('commands').doc().set({
+          token: message.token,
+          application_id: message.application_id,
+          guild_id: message.guild_id,
+          type: 'preview',
+          collection1,
+          token1,
+          collection2,
+          token2,
+        });
+
+        response.status(200).send({
+          type: 4,
+          data: {
+            content: `3, 2, 1 fight preview incoming ...`,
+          },
+        });
       } else {
         console.error('Unknown Command');
         response.status(400).send({ error: 'Unknown Type' });
@@ -125,7 +148,7 @@ export const handle = async (admin: any, request: any, response: any) => {
             }],
           },
         });
-      } else if (action === 'fight') {
+      } else if (action === 'fight' || action === 'preview') {
         if (message.data.options[0].focused) {
           response.status(200).send({
             type: 8,
